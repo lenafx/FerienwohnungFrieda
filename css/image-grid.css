@@ -1,0 +1,226 @@
+/* Image Gallery Section */
+.image-gallery {
+    min-height: calc(100vh - var(--header-height));
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0rem;
+}
+
+.gallery-header {
+    text-align: center;
+    margin-bottom: 0rem;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease forwards;
+    animation-delay: 0.3s;
+}
+
+.gallery-header h1 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #2c3e50;
+    margin-bottom: var(--space-md);
+    letter-spacing: 0.0px;
+}
+
+.gallery-header h2 {
+    font-size: 1.2rem;
+    font-weight: 300;
+    color: #2c3e50;
+    letter-spacing: 1px;
+}
+
+/* Image Grid Styles */
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 0.5rem;
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 16/9;
+    max-width: 1200px;
+    margin: 1rem auto;
+}
+
+.image-grid-item {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    user-select: none;
+}
+
+.image-grid-item:first-child {
+    grid-column: span 2;
+    grid-row: span 2;
+    border-top-left-radius: 12px;
+}
+
+.image-grid-item:nth-child(3) {
+    border-top-right-radius: 12px;
+}
+
+.image-grid-item:nth-child(6) {
+    border-bottom-left-radius: 12px;
+}
+
+.image-grid-item:nth-child(9) {
+    border-bottom-right-radius: 12px;
+}
+
+.image-grid-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    pointer-events: none;
+}
+
+.image-grid-item:hover img {
+    transform: scale(1.05);
+}
+
+.image-grid-item::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.image-grid-item:hover::after {
+    opacity: 1;
+}
+
+/* Responsive Design */
+@media (min-width: 769px) and (max-width: 1200px) {
+    .image-grid {
+        max-width: 800px;
+        gap: 0.4rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .image-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(4, 1fr);
+        aspect-ratio: 1/1;
+    }
+
+    .image-grid-item:first-child {
+        grid-column: span 2;
+        grid-row: span 2;
+    }
+}
+
+@media (max-width: 480px) {
+    .image-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(8, 1fr);
+    }
+
+    .image-grid-item:first-child {
+        grid-column: span 1;
+        grid-row: span 1;
+    }
+}
+
+/* Lightbox Styles */
+.lightbox {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 1000;
+}
+
+.lightbox.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.lightbox-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90vh;
+    width: 1200px;
+    height: 800px;
+}
+
+.lightbox-content img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.lightbox-close,
+.lightbox-prev,
+.lightbox-next {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 1rem;
+    transition: background-color 0.3s ease;
+    z-index: 1001;
+}
+
+.lightbox-close:hover,
+.lightbox-prev:hover,
+.lightbox-next:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.lightbox-close {
+    top: 1rem;
+    right: 1rem;
+}
+
+.lightbox-prev {
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.lightbox-next {
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+@media (max-width: 768px) {
+    .lightbox-content {
+        width: 90vw;
+        height: 60vh;
+    }
+    
+    .lightbox-close,
+    .lightbox-prev,
+    .lightbox-next {
+        font-size: 1.5rem;
+        padding: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .lightbox-content {
+        width: 95vw;
+        height: 50vh;
+    }
+} 

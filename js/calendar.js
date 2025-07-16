@@ -1,0 +1,924 @@
+// === BEGIN: Unavailable Dates Feature ===
+
+// 1. Hardcoded unavailable dates (ISO format, yyyy-mm-dd)
+const UNAVAILABLE_DATES = [
+    "2025-12-01",
+    { from: "2025-09-05", to: "2025-10-07" },
+    { from: "2025-08-02", to: "2025-08-05" },
+];
+    
+class BookingCalendar {
+    constructor(containerId) {
+        this.container = document.getElementById(containerId);
+        // Always start from the first day of the current month
+        const now = new Date();
+        this.currentDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        this.selectedDates = {
+            start: null,
+            end: null
+        };
+        this.bookedDates = []; // This will be populated from your backend
+        this.monthsToShow = 2; // Show 2 months at a time
+        // Store the minimum allowed month/year for navigation
+        this.minYear = now.getFullYear();
+        this.minMonth = now.getMonth();
+        this.currentYear = this.minYear;
+        this.nextYear = this.currentYear + 1;
+        this.init();
+    }
+
+    init() {
+        this.renderCalendar();
+        this.setupEventListeners();
+    }
+
+    renderCalendar() {
+        let html = `
+            <div class="calendar-header">
+                <div class="header-line">
+                    <h3>Verfügbarkeit</h3>
+                </div>
+                <div class="header-line">
+                    <button class="prev-year" ${(this.currentDate.getFullYear() <= this.minYear && this.currentDate.getMonth() <= this.minMonth) ? 'disabled' : ''}>&lt;&lt;</button>
+                    <button class="prev-month" ${(this.currentDate.getFullYear() === this.minYear && this.currentDate.getMonth() <= this.minMonth) ? 'disabled' : ''}>&lt;</button>
+                    <h3>${this.currentDate.getFullYear()}</h3>
+                    <button class="next-month" ${(this.currentDate.getMonth() === 11 && this.currentDate.getFullYear() === this.nextYear) ? 'disabled' : ''}>&gt;</button>
+                    <button class="next-year" ${(this.currentDate.getFullYear() >= this.nextYear) ? 'disabled' : ''}>&gt;&gt;</button>
+                </div>
+            </div>
+            <div class="months-container">
+        `;
+
+        for (let i = 0; i < this.monthsToShow; i++) {
+            const date = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + i, 1);
+            html += this.renderMonth(date);
+        }
+
+        html += '</div>';
+        this.container.innerHTML = html;
+    }
+
+    renderMonth(date) {
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        
+        let html = `
+            <div class="month-container">
+                <h3>${this.getMonthName(month)} ${year}</h3>
+                <div class="calendar-grid">
+                    <div class="weekdays">
+                        <span>Mo</span>
+                        <span>Di</span>
+                        <span>Mi</span>
+                        <span>Do</span>
+                        <span>Fr</span>
+                        <span>Sa</span>
+                        <span>So</span>
+                    </div>
+                    <div class="days">
+        `;
+
+        // Add empty cells for days before the first day of the month
+        for (let i = 0; i < (firstDay.getDay() || 7) - 1; i++) {
+            html += '<div class="day empty"></div>';
+        }
+
+        // Add days of the month
+        for (let day = 1; day <= lastDay.getDate(); day++) {
+            const currentDate = new Date(year, month, day);
+            const isBooked = this.isDateBooked(currentDate);
+            const isPast = this.isDateInPast(currentDate);
+            const isUnavailable = this.isDateUnavailable(currentDate);
+            const isSelected = this.isDateSelected(currentDate);
+            const isInRange = this.isDateInRange(currentDate);
+            
+            let classes = 'day';
+            if (isBooked) classes += ' booked';
+            if (isPast) classes += ' past';
+            if (isUnavailable) classes += ' unavailable';
+            if (isSelected) classes += ' selected';
+            if (isInRange) classes += ' in-range';
+
+            // Visually disable end dates that are too close to the start date
+            let isTooSoon = false;
+            if (this.selectedDates.start && !this.selectedDates.end) {
+                const startDate = new Date(this.selectedDates.start);
+                startDate.setHours(0,0,0,0);
+                const checkDate = new Date(currentDate);
+                checkDate.setHours(0,0,0,0);
+                const nights = Math.ceil((checkDate - startDate) / (1000 * 60 * 60 * 24));
+                // Only mark as too-soon if after start date but less than 3 nights
+                if (checkDate > startDate && nights < 3) {
+                    isTooSoon = true;
+                    classes += ' too-soon';
+                }
+            }
+            
+            // Add data attribute for past or unavailable dates
+            const dataAttributes = [
+                (isPast || isUnavailable) ? 'data-past="true"' : '',
+                isTooSoon ? 'data-too-soon="true"' : ''
+            ].filter(Boolean).join(' ');
+            
+            html += `<div class="${classes}" data-date="${currentDate.toISOString()}" ${dataAttributes}>${day}</div>`;
+        }
+
+        html += '</div></div></div>';
+        return html;
+    }
+
+    setupEventListeners() {
+        // Separate event listeners for navigation and date selection
+        this.setupNavigationListeners();
+        this.setupDateSelectionListeners();
+    }
+
+    setupNavigationListeners() {
+        // Navigation buttons with direct event listeners
+        const prevMonthBtn = this.container.querySelector('.prev-month');
+        const nextMonthBtn = this.container.querySelector('.next-month');
+        const prevYearBtn = this.container.querySelector('.prev-year');
+        const nextYearBtn = this.container.querySelector('.next-year');
+
+        if (prevMonthBtn) {
+            prevMonthBtn.onclick = (e) => {
+                e.stopPropagation(); // Prevent event bubbling
+                // Prevent navigating to months before the current month
+                if (
+                    (this.currentDate.getFullYear() === this.minYear && this.currentDate.getMonth() <= this.minMonth)
+                ) {
+                    return;
+                }
+                this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+                // If we go before the min month, reset to min month
+                if (
+                    this.currentDate.getFullYear() < this.minYear ||
+                    (this.currentDate.getFullYear() === this.minYear && this.currentDate.getMonth() < this.minMonth)
+                ) {
+                    this.currentDate = new Date(this.minYear, this.minMonth, 1);
+                }
+                this.renderCalendar();
+                this.setupNavigationListeners(); // Reattach listeners after render
+            };
+        }
+
+        if (nextMonthBtn) {
+            nextMonthBtn.onclick = (e) => {
+                e.stopPropagation(); // Prevent event bubbling
+                this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+                this.renderCalendar();
+                this.setupNavigationListeners(); // Reattach listeners after render
+            };
+        }
+
+        if (prevYearBtn) {
+            prevYearBtn.onclick = (e) => {
+                e.stopPropagation(); // Prevent event bubbling
+                // Prevent navigating to years before the min year/month
+                if (
+                    (this.currentDate.getFullYear() === this.minYear && this.currentDate.getMonth() <= this.minMonth)
+                ) {
+                    return;
+                }
+                this.currentDate.setFullYear(this.currentDate.getFullYear() - 1);
+                // If we go before the min year/month, reset to min year/month
+                if (
+                    this.currentDate.getFullYear() < this.minYear ||
+                    (this.currentDate.getFullYear() === this.minYear && this.currentDate.getMonth() < this.minMonth)
+                ) {
+                    this.currentDate = new Date(this.minYear, this.minMonth, 1);
+                }
+                this.renderCalendar();
+                this.setupNavigationListeners(); // Reattach listeners after render
+            };
+        }
+
+        if (nextYearBtn) {
+            nextYearBtn.onclick = (e) => {
+                e.stopPropagation(); // Prevent event bubbling
+                if (this.currentDate.getFullYear() < this.nextYear) {
+                    this.currentDate.setFullYear(this.currentDate.getFullYear() + 1);
+                    this.renderCalendar();
+                    this.setupNavigationListeners(); // Reattach listeners after render
+                }
+            };
+        }
+    }
+
+    setupDateSelectionListeners() {
+        // Use event delegation for day clicks, but be more specific
+        this.container.addEventListener('click', (e) => {
+            // Only handle clicks on day elements, not navigation buttons
+            if (e.target.classList.contains('day') && !e.target.classList.contains('empty')) {
+                e.stopPropagation(); // Prevent event bubbling
+                // Prevent selection if booked, past, unavailable, or too-soon
+                if (
+                    this.isDateBooked(new Date(e.target.dataset.date)) ||
+                    this.isDateInPast(new Date(e.target.dataset.date)) ||
+                    this.isDateUnavailable(new Date(e.target.dataset.date)) ||
+                    e.target.classList.contains('too-soon')
+                ) {
+                    return;
+                }
+                const date = new Date(e.target.dataset.date);
+                console.log('Day clicked:', e.target.dataset.date);
+                this.handleDayClick(e.target);
+            }
+        });
+    }
+
+    handleDayClick(day) {
+        const date = new Date(day.dataset.date);
+        console.log('Handling click for date:', date);
+
+        if (this.isDateBooked(date) || this.isDateInPast(date) || this.isDateUnavailable(date)) {
+            console.log('Date is booked, past, or unavailable, returning');
+            return;
+        }
+
+        // If no date is selected or both dates are selected, start new selection
+        if (!this.selectedDates.start || (this.selectedDates.start && this.selectedDates.end)) {
+            console.log('Starting new selection');
+            this.selectedDates.start = date;
+            this.selectedDates.end = null;
+        } 
+        // If only start date is selected, set end date if it's after start date and at least 3 nights
+        else if (this.selectedDates.start && !this.selectedDates.end) {
+            console.log('Attempting to set end date');
+            const startDate = new Date(this.selectedDates.start);
+            startDate.setHours(0, 0, 0, 0);
+            const endDate = new Date(date);
+            endDate.setHours(0, 0, 0, 0);
+
+            const nights = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+            console.log('Date comparison:', {
+                startDate: startDate.getTime(),
+                endDate: endDate.getTime(),
+                nights: nights,
+                isValid: endDate.getTime() >= startDate.getTime() && nights >= 3
+            });
+
+            // Check for unavailable dates in the range
+            if (endDate.getTime() >= startDate.getTime() && nights >= 3) {
+                if (this.isRangeUnavailable(startDate, endDate)) {
+                    alert('Der gewählte Zeitraum enthält nicht verfügbare Tage.');
+                    // Restart selection
+                    this.selectedDates.start = null;
+                    this.selectedDates.end = null;
+                    this.renderCalendar();
+                    this.setupNavigationListeners();
+                    this.updateBookingSummary();
+                    return;
+                }
+                console.log('Setting end date');
+                this.selectedDates.end = date;
+            } else if (endDate.getTime() >= startDate.getTime() && nights < 3) {
+                alert('Die Mindestaufenthaltsdauer beträgt 3 Nächte.');
+            }
+        }
+
+        console.log('New state:', {
+            start: this.selectedDates.start,
+            end: this.selectedDates.end
+        });
+
+        this.renderCalendar();
+        this.setupNavigationListeners();
+        this.updateBookingSummary();
+    }
+
+    isDateBooked(date) {
+        return this.bookedDates.some(bookedDate => 
+            date.toDateString() === new Date(bookedDate).toDateString()
+        );
+    }
+
+    isDateInPast(date) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        // Create a new date object and set it to midnight in the local timezone
+        const checkDate = new Date(date);
+        checkDate.setHours(0, 0, 0, 0);
+        
+        // Compare dates using UTC to avoid timezone issues
+        const todayUTC = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+        const checkDateUTC = Date.UTC(checkDate.getFullYear(), checkDate.getMonth(), checkDate.getDate());
+        
+        return checkDateUTC < todayUTC;
+    }
+
+    isDateSelected(date) {
+        if (!this.selectedDates.start) return false;
+        
+        const checkDate = new Date(date);
+        checkDate.setHours(0, 0, 0, 0);
+        
+        const startDate = new Date(this.selectedDates.start);
+        startDate.setHours(0, 0, 0, 0);
+        
+        if (this.selectedDates.end) {
+            const endDate = new Date(this.selectedDates.end);
+            endDate.setHours(0, 0, 0, 0);
+            
+            return checkDate.getTime() === startDate.getTime() || 
+                   checkDate.getTime() === endDate.getTime();
+        }
+        
+        return checkDate.getTime() === startDate.getTime();
+    }
+
+    isDateInRange(date) {
+        if (!this.selectedDates.start || !this.selectedDates.end) return false;
+        
+        const checkDate = new Date(date);
+        checkDate.setHours(0, 0, 0, 0);
+        
+        const startDate = new Date(this.selectedDates.start);
+        startDate.setHours(0, 0, 0, 0);
+        
+        const endDate = new Date(this.selectedDates.end);
+        endDate.setHours(0, 0, 0, 0);
+        
+        return checkDate.getTime() > startDate.getTime() && 
+               checkDate.getTime() < endDate.getTime();
+    }
+
+    // Add this method to the BookingCalendar class
+    isDateUnavailable(date) {
+        // Compare only the date part (not time)
+        const dateStr = date.toISOString().split('T')[0];
+        for (const entry of UNAVAILABLE_DATES) {
+            if (typeof entry === "string") {
+                if (entry === dateStr) return true;
+            } else if (entry && entry.from && entry.to) {
+                // Use Date objects for accurate comparison
+                const from = new Date(entry.from);
+                const to = new Date(entry.to);
+                from.setHours(0,0,0,0);
+                to.setHours(0,0,0,0);
+                const check = new Date(date);
+                check.setHours(0,0,0,0);
+                if (check >= from && check <= to) return true;
+            }
+        }
+        return false;
+    }
+
+    // Update isDateInPast to allow combined logic if needed
+    isDateInPastOrUnavailable(date) {
+        return this.isDateInPast(date) || this.isDateUnavailable(date);
+    }
+
+    // Helper to check if any date in a range is unavailable
+    isRangeUnavailable(startDate, endDate) {
+        let current = new Date(startDate);
+        current.setHours(0,0,0,0);
+        const end = new Date(endDate);
+        end.setHours(0,0,0,0);
+        while (current <= end) {
+            if (this.isDateUnavailable(current)) {
+                return true;
+            }
+            current.setDate(current.getDate() + 1);
+        }
+        return false;
+    }
+
+    getMonthName(month) {
+        const months = [
+            'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
+            'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'
+        ];
+        return months[month];
+    }
+
+    updateBookingSummary() {
+        const summary = document.getElementById('booking-summary');
+        if (!summary) return;
+
+        const checkinInput = summary.querySelector('#summary-checkin');
+        const checkoutInput = summary.querySelector('#summary-checkout');
+        const nightsInput = summary.querySelector('input[readonly]:not(#summary-checkin):not(#summary-checkout)');
+        const guestSelect = summary.querySelector('#summary-guests');
+
+        if (this.selectedDates.start && this.selectedDates.end) {
+            const nights = Math.ceil((this.selectedDates.end - this.selectedDates.start) / (1000 * 60 * 60 * 24));
+            
+            if (checkinInput) checkinInput.value = this.formatDate(this.selectedDates.start);
+            if (checkoutInput) checkoutInput.value = this.formatDate(this.selectedDates.end);
+            if (nightsInput) nightsInput.value = nights;
+            
+            // Calculate costs
+            this.updateCostCalculation(nights);
+            
+            // Update the main booking form with selected dates
+            this.updateBookingFormDates();
+            
+            // Add event listener to the guest select if not already added
+            if (guestSelect && !guestSelect.hasEventListener) {
+                guestSelect.addEventListener('change', (e) => {
+                    // Update the main booking form's guest selection
+                    const mainGuestSelect = document.getElementById('guests');
+                    if (mainGuestSelect) {
+                        mainGuestSelect.value = e.target.value;
+                    }
+                    
+                    // Update cost calculation
+                    const nights = Math.ceil((this.selectedDates.end - this.selectedDates.start) / (1000 * 60 * 60 * 24));
+                    this.updateCostCalculation(nights);
+                });
+                guestSelect.hasEventListener = true;
+            }
+            
+            // Add event listener to the "Jetzt anfragen" button
+            const bookNowButton = summary.querySelector('.book-now');
+            if (bookNowButton && !bookNowButton.hasEventListener) {
+                bookNowButton.addEventListener('click', () => {
+                    // Scroll to the booking form with header-height offset
+                    const bookingForm = document.getElementById('booking-form');
+                    if (bookingForm) {
+                       // Get header height from CSS variable or fallback
+                       const headerOffset = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 70;
+                       const elementPosition = bookingForm.getBoundingClientRect().top + window.pageYOffset;
+                       const offsetPosition = elementPosition - 1.7*headerOffset;
+                       window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+                        // bookingForm.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+                bookNowButton.hasEventListener = true;
+            }
+        } else if (this.selectedDates.start) {
+            if (checkinInput) checkinInput.value = this.formatDate(this.selectedDates.start);
+            if (checkoutInput) checkoutInput.value = '';
+            if (nightsInput) nightsInput.value = '';
+            
+            // Update only the check-in date in the main booking form
+            this.updateBookingFormDates();
+            
+            // Clear cost calculation
+            this.updateCostCalculation(0);
+        } else {
+            if (checkinInput) checkinInput.value = '';
+            if (checkoutInput) checkoutInput.value = '';
+            if (nightsInput) nightsInput.value = '';
+            
+            // Clear cost calculation
+            this.updateCostCalculation(0);
+        }
+    }
+
+    updateBookingFormDates() {
+        const checkinInput = document.getElementById('checkin');
+        const checkoutInput = document.getElementById('checkout');
+        const summaryCheckinInput = document.getElementById('summary-checkin');
+        const summaryCheckoutInput = document.getElementById('summary-checkout');
+        
+        if (this.selectedDates.start && checkinInput) {
+            checkinInput.value = this.formatDateForInput(this.selectedDates.start);
+        }
+        
+        if (this.selectedDates.end && checkoutInput) {
+            checkoutInput.value = this.formatDateForInput(this.selectedDates.end);
+        }
+        
+        // Update summary inputs
+        if (this.selectedDates.start && summaryCheckinInput) {
+            summaryCheckinInput.value = this.formatDateForInput(this.selectedDates.start);
+        }
+        
+        if (this.selectedDates.end && summaryCheckoutInput) {
+            summaryCheckoutInput.value = this.formatDateForInput(this.selectedDates.end);
+        }
+    }
+
+    formatDateForInput(date) {
+        // Format date for European display (DD.MM.YYYY)
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}.${month}.${year}`;
+    }
+
+    parseEuropeanDate(dateString) {
+        // Parse European date format (DD.MM.YYYY) to Date object
+        const [day, month, year] = dateString.split('.').map(Number);
+        if (day && month && year) {
+            return new Date(year, month - 1, day);
+        }
+        return null;
+    }
+
+    calculateNightlyRate(guests) {
+        // Calculate nightly rate based on number of guests
+        switch(parseInt(guests)) {
+            case 1: return 75;
+            case 2: return 85;
+            case 3: return 95;
+            default: return 0;
+        }
+    }
+
+    updateCostCalculation(nights) {
+        const summary = document.getElementById('booking-summary');
+        if (!summary) return;
+
+        const guestSelect = summary.querySelector('#summary-guests');
+        const costDisplay = summary.querySelector('.cost-calculation');
+        
+        if (!guestSelect || !costDisplay) return;
+
+        const guests = guestSelect.value;
+        if (!guests || nights <= 0) {
+            costDisplay.innerHTML = '';
+            return;
+        }
+
+        const nightlyRate = this.calculateNightlyRate(guests);
+        const accommodationCost = nightlyRate * nights;
+        const bedsheetFee = 10*guests;
+        const subtotal = accommodationCost + bedsheetFee;
+        const cleaningFee = 60;
+        const total = subtotal + cleaningFee;
+
+        costDisplay.innerHTML = `
+            <div class="cost-item">
+                <span>Unterkunft (${nights} Nacht${nights > 1 ? 'e' : ''} × ${nightlyRate}€)</span>
+                <span>${accommodationCost.toFixed(2)}€</span>
+            </div>
+            <div class="cost-item">
+                <span>Bettwäsche</span>
+                <span>${bedsheetFee.toFixed(2)}€</span>
+            </div>
+            <div class="cost-item subtotal">
+                <span>Zwischensumme</span>
+                <span>${subtotal.toFixed(2)}€</span>
+            </div>
+            <div class="cost-item">
+                <span>Endreinigung</span>
+                <span>${cleaningFee.toFixed(2)}€</span>
+            </div>
+            <div class="cost-item total">
+                <span>Gesamtpreis</span>
+                <span>${total.toFixed(2)}€</span>
+            </div>
+        `;
+    }
+
+    formatDate(date) {
+        // Ensure European date format (DD.MM.YYYY)
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}.${month}.${year}`;
+    }
+}
+// === END: Unavailable Dates Feature ===
+
+// Initialize the calendar when the DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    // Create calendar instance and make it globally accessible
+    window.bookingCalendar = new BookingCalendar('booking-calendar');
+    
+    // Sync guest selection between main form and summary
+    const mainGuestSelect = document.getElementById('guests');
+    if (mainGuestSelect) {
+        mainGuestSelect.addEventListener('change', (e) => {
+            const summaryGuestSelect = document.getElementById('summary-guests');
+            if (summaryGuestSelect) {
+                summaryGuestSelect.value = e.target.value;
+            }
+            
+            // Update cost calculation when guest selection changes
+            const calendar = window.bookingCalendar;
+            if (calendar && calendar.selectedDates.start && calendar.selectedDates.end) {
+                const nights = Math.ceil((calendar.selectedDates.end - calendar.selectedDates.start) / (1000 * 60 * 60 * 24));
+                calendar.updateCostCalculation(nights);
+            }
+        });
+    }
+    
+    // Initialize the booking form
+    initBookingForm();
+    
+    // Initialize summary date inputs
+    initSummaryDateInputs();
+});
+
+function initBookingForm() {
+    const bookingForm = document.getElementById('booking-form');
+    if (!bookingForm) return;
+    
+    // Set minimum dates for check-in and check-out
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const checkinInput = document.getElementById('checkin');
+    const checkoutInput = document.getElementById('checkout');
+    
+    if (checkinInput) {
+        // Set minimum date in European format
+        const minDate = window.bookingCalendar.formatDateForInput(tomorrow);
+        checkinInput.setAttribute('data-min-date', minDate);
+        
+        // Add event listener to sync check-in changes with calendar
+        checkinInput.addEventListener('change', function() {
+            const calendar = window.bookingCalendar;
+            if (calendar && this.value) {
+                // Parse European date format
+                const newDate = calendar.parseEuropeanDate(this.value);
+                if (newDate) {
+                    calendar.selectedDates.start = newDate;
+                    // If end date is set, check for unavailable dates in the new range
+                    if (calendar.selectedDates.end) {
+                        const endDate = new Date(calendar.selectedDates.end);
+                        endDate.setHours(0,0,0,0);
+                        const startDate = new Date(newDate);
+                        startDate.setHours(0,0,0,0);
+                        if (endDate > startDate) {
+                            const nights = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+                            if (nights >= 3 && calendar.isRangeUnavailable(startDate, endDate)) {
+                                alert('Der gewählte Zeitraum enthält nicht verfügbare Tage.');
+                                resetDateSelection();
+                                return;
+                            }
+                        }
+                    }
+                    calendar.renderCalendar();
+                    calendar.updateBookingSummary();
+                }
+            }
+        });
+    }
+    
+    if (checkoutInput) {
+        // Set minimum date in European format
+        const minDate = window.bookingCalendar.formatDateForInput(tomorrow);
+        checkoutInput.setAttribute('data-min-date', minDate);
+        
+        // Add event listener to sync check-out changes with calendar
+        checkoutInput.addEventListener('change', function() {
+            const calendar = window.bookingCalendar;
+            if (calendar && this.value) {
+                // Parse European date format
+                const newDate = calendar.parseEuropeanDate(this.value);
+                if (newDate) {
+                    // Check end date is after start date
+                    if (calendar.selectedDates.start) {
+                        const startDate = new Date(calendar.selectedDates.start);
+                        startDate.setHours(0,0,0,0);
+                        if (newDate <= startDate) {
+                            alert('Das Abreisedatum muss nach dem Anreisedatum liegen.');
+                            this.value = '';
+                            resetDateSelection();
+                            return;
+                        }
+                        const nights = Math.ceil((newDate - startDate) / (1000 * 60 * 60 * 24));
+                        if (newDate > startDate && nights < 3) {
+                            alert('Die Mindestaufenthaltsdauer beträgt 3 Nächte.');
+                            this.value = '';
+                            resetDateSelection();
+                            return;
+                        }
+                        // Check for unavailable dates in the range
+                        if (nights >= 3 && calendar.isRangeUnavailable(startDate, newDate)) {
+                            alert('Der gewählte Zeitraum enthält nicht verfügbare Tage.');
+                            this.value = '';
+                            resetDateSelection();
+                            return;
+                        }
+                    }
+                    calendar.selectedDates.end = newDate;
+                    calendar.renderCalendar();
+                    calendar.updateBookingSummary();
+                }
+            }
+        });
+    }
+    
+    // Handle form submission
+    bookingForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(bookingForm);
+        const bookingData = {
+            name: formData.get('name'),
+            email: formData.get('email'),
+            phone: formData.get('phone'),
+            checkin: formData.get('checkin'),
+            checkout: formData.get('checkout'),
+            guests: formData.get('guests'),
+            message: formData.get('message')
+        };
+        
+        // Validate dates using European format
+        const calendar = window.bookingCalendar;
+        const checkin = calendar.parseEuropeanDate(bookingData.checkin);
+        const checkout = calendar.parseEuropeanDate(bookingData.checkout);
+        
+        if (!checkin || !checkout) {
+            alert('Bitte geben Sie gültige Daten im Format DD.MM.YYYY ein.');
+            return;
+        }
+        
+        if (checkout <= checkin) {
+            alert('Das Abreisedatum muss nach dem Anreisedatum liegen.');
+            return;
+        }
+        
+        // Enforce minimum booking period of 3 nights
+        const nights = Math.ceil((checkout - checkin) / (1000 * 60 * 60 * 24));
+        if (nights < 3) {
+            alert('Die Mindestaufenthaltsdauer beträgt 3 Nächte.');
+            return;
+        }
+        // Check for unavailable dates in the range
+        if (calendar.isRangeUnavailable(checkin, checkout)) {
+            alert('Der gewählte Zeitraum enthält nicht verfügbare Tage.');
+            return;
+        }
+        
+        // Simulate form submission
+        console.log('Booking request:', bookingData);
+        
+        // Show success message
+        alert('Vielen Dank für Ihre Anfrage! Wir werden uns innerhalb von 24 Stunden bei Ihnen melden.');
+        
+        // Reset form
+        bookingForm.reset();
+    });
+    
+    // Update checkout minimum date when checkin changes
+    if (checkinInput && checkoutInput) {
+        checkinInput.addEventListener('change', function() {
+            const calendar = window.bookingCalendar;
+            const checkinDate = calendar.parseEuropeanDate(this.value);
+            if (checkinDate) {
+                const nextDay = new Date(checkinDate);
+                nextDay.setDate(nextDay.getDate() + 1);
+                const minDate = calendar.formatDateForInput(nextDay);
+                checkoutInput.setAttribute('data-min-date', minDate);
+                
+                // If checkout date is before new checkin date, clear it
+                if (checkoutInput.value) {
+                    const checkoutDate = calendar.parseEuropeanDate(checkoutInput.value);
+                    if (checkoutDate && checkoutDate <= checkinDate) {
+                        checkoutInput.value = '';
+                    }
+                }
+            }
+        });
+    }
+}
+
+function initSummaryDateInputs() {
+    const summaryCheckinInput = document.getElementById('summary-checkin');
+    const summaryCheckoutInput = document.getElementById('summary-checkout');
+    
+    if (summaryCheckinInput) {
+        summaryCheckinInput.addEventListener('change', function() {
+            const calendar = window.bookingCalendar;
+            if (calendar && this.value) {
+                // Parse European date format
+                const newDate = calendar.parseEuropeanDate(this.value);
+                if (newDate) {
+                    calendar.selectedDates.start = newDate;
+                    // If end date is set, check for unavailable dates in the new range
+                    if (calendar.selectedDates.end) {
+                        const endDate = new Date(calendar.selectedDates.end);
+                        endDate.setHours(0,0,0,0);
+                        const startDate = new Date(newDate);
+                        startDate.setHours(0,0,0,0);
+                        if (endDate > startDate) {
+                            const nights = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+                            if (nights >= 3 && calendar.isRangeUnavailable(startDate, endDate)) {
+                                alert('Der gewählte Zeitraum enthält nicht verfügbare Tage.');
+                                resetDateSelection();
+                                return;
+                            }
+                        }
+                    }
+                    calendar.renderCalendar();
+                    calendar.updateBookingSummary();
+                }
+            }
+        });
+    }
+    
+    if (summaryCheckoutInput) {
+        summaryCheckoutInput.addEventListener('change', function() {
+            const calendar = window.bookingCalendar;
+            if (calendar && this.value) {
+                // Parse European date format
+                const newDate = calendar.parseEuropeanDate(this.value);
+                if (newDate) {
+                    // Check end date is after start date
+                    if (calendar.selectedDates.start) {
+                        const startDate = new Date(calendar.selectedDates.start);
+                        startDate.setHours(0,0,0,0);
+                        if (newDate <= startDate) {
+                            alert('Das Abreisedatum muss nach dem Anreisedatum liegen.');
+                            this.value = '';
+                            resetDateSelection();
+                            return;
+                        }
+                        const nights = Math.ceil((newDate - startDate) / (1000 * 60 * 60 * 24));
+                        if (newDate > startDate && nights < 3) {
+                            alert('Die Mindestaufenthaltsdauer beträgt 3 Nächte.');
+                            this.value = '';
+                            resetDateSelection();
+                            return;
+                        }
+                        // Check for unavailable dates in the range
+                        if (nights >= 3 && calendar.isRangeUnavailable(startDate, newDate)) {
+                            alert('Der gewählte Zeitraum enthält nicht verfügbare Tage.');
+                            this.value = '';
+                            resetDateSelection();
+                            return;
+                        }
+                    }
+                    calendar.selectedDates.end = newDate;
+                    calendar.renderCalendar();
+                    calendar.updateBookingSummary();
+                }
+            }
+        });
+    }
+}
+
+// Helper to reset date selection everywhere
+function resetDateSelection() {
+    const calendar = window.bookingCalendar;
+    if (!calendar) return;
+    calendar.selectedDates.start = null;
+    calendar.selectedDates.end = null;
+    // Clear booking form inputs
+    const checkinInput = document.getElementById('checkin');
+    const checkoutInput = document.getElementById('checkout');
+    if (checkinInput) checkinInput.value = '';
+    if (checkoutInput) checkoutInput.value = '';
+    // Clear summary inputs
+    const summaryCheckinInput = document.getElementById('summary-checkin');
+    const summaryCheckoutInput = document.getElementById('summary-checkout');
+    if (summaryCheckinInput) summaryCheckinInput.value = '';
+    if (summaryCheckoutInput) summaryCheckoutInput.value = '';
+    calendar.renderCalendar();
+    calendar.updateBookingSummary();
+}
+
+// Custom slow scroll for anchor links
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Select all anchor links that scroll to an id on the same page
+    document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
+        anchor.addEventListener('click', function (e) {
+            // Only handle if the target is on the current page
+            const href = anchor.getAttribute('href');
+            if (href.length > 1 && document.getElementById(href.substring(1))) {
+                e.preventDefault();
+                const target = document.getElementById(href.substring(1));
+                if (!target) return;
+                // Custom slow scroll
+                slowScrollTo(target, 1500); // 1500ms for slower effect
+            }
+        });
+    });
+
+    function slowScrollTo(element, duration) {
+        const headerOffset = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 70;
+        const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+        const offsetPosition = elementPosition - headerOffset;
+        const startPosition = window.pageYOffset;
+        const distance = offsetPosition - startPosition;
+        let startTime = null;
+
+        function animation(currentTime) {
+            if (startTime === null) startTime = currentTime;
+            const timeElapsed = currentTime - startTime;
+            const run = easeInOutQuad(timeElapsed, startPosition, distance, duration);
+            window.scrollTo(0, run);
+            if (timeElapsed < duration) {
+                requestAnimationFrame(animation);
+            } else {
+                window.scrollTo(0, offsetPosition);
+                // Update the URL hash without causing a jump
+                if (element.id) {
+                    history.replaceState(null, '', '#' + element.id);
+                }
+            }
+        }
+
+        // Ease function for smooth effect
+        function easeInOutQuad(t, b, c, d) {
+            t /= d / 2;
+            if (t < 1) return c / 2 * t * t + b;
+            t--;
+            return -c / 2 * (t * (t - 2) - 1) + b;
+        }
+
+        requestAnimationFrame(animation);
+    }
+});
