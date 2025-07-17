@@ -14,13 +14,18 @@
             <div class="logo">
                 <a href="#kite-background">Ferienwohnung Frieda</a>
             </div>
-            <ul>
-                <li><a href="#image-gallery">Bilder</a></li>
+            <ul class="nav-menu">
+                <li><a href="#text-background">Bilder</a></li>
                 <li><a href="#text-section">Ferienwohnung</a></li>
                 <li><a href="#calendar-section">Verfügbarkeit</a></li>
                 <li><a href="#location-section">Flensburg</a></li>
                 <li><a href="#field-background">Kontakt</a></li>
             </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
         </nav>
     </header>
 
@@ -29,6 +34,15 @@
             <div class="kite-background-content">
                 <h1>Ferienwohnung Frieda</h1>
                 <h2>Willkommen in Flensburg</h2>
+            </div>
+        </section>
+
+        <!-- Mobile-only header section -->
+        <section class="mobile-header">
+            <div class="mobile-header-content"><!-- 
+                <h1>Ferienwohnung Frieda</h1>
+                <h2>Ihr Zuhause in Flensburg</h2> -->
+                <h2>Entdecken Sie unsere gemütliche Unterkunft für bis zu 3 Personen in der historischen Altstadt von Flensburg.</h2>
             </div>
         </section>
 
@@ -68,9 +82,33 @@
         </section>
 
         <section id="text-background" class="text-background">
+            <div class="text-background-slider">
+                <div class="text-background-slide active" style="background-image: url('images/background/terrasse.jpg');"></div>
+                <div class="text-background-slide" style="background-image: url('images/frieda/dach.jpg');"></div>
+                <div class="text-background-slide" style="background-image: url('images/frieda/kueche.jpeg');"></div>
+                <div class="text-background-slide" style="background-image: url('images/frieda/bad.jpg');"></div>
+                <div class="text-background-slide" style="background-image: url('images/frieda/dusche.jpg');"></div>
+                <div class="text-background-slide" style="background-image: url('images/frieda/fensterbank.jpg');"></div>
+                <div class="text-background-slide" style="background-image: url('images/frieda/kinderzimmer.jpg');"></div>
+                <div class="text-background-slide" style="background-image: url('images/frieda/schlafzimmer.jpg');"></div>
+                <div class="text-background-slide" style="background-image: url('images/frieda/wohnen.jpg');"></div>
+                <div class="text-background-slide" style="background-image: url('images/frieda/esstisch.jpg');"></div>
+            </div>
             <div class="text-background-content">
                 <h1>Ferienwohnung Frieda</h1>
                 <h2>Ihr Zuhause in Flensburg</h2>
+            </div>
+            <div class="swipe-indicators">
+                <span class="indicator active"></span>
+                <span class="indicator"></span>
+                <span class="indicator"></span>
+                <span class="indicator"></span>
+                <span class="indicator"></span>
+                <span class="indicator"></span>
+                <span class="indicator"></span>
+                <span class="indicator"></span>
+                <span class="indicator"></span>
+                <span class="indicator"></span>
             </div>
         </section>
 
@@ -166,6 +204,28 @@
                     </div>
                     <div class="cost-calculation">
                     </div>
+                    
+                    <!-- Mobile form fields -->
+                    <div class="mobile-form-fields">
+                        <div class="form-group">
+                            <label for="mobile-name">Name *</label>
+                            <input type="text" id="mobile-name" name="mobile-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="mobile-email">E-Mail *</label>
+                            <input type="email" id="mobile-email" name="mobile-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="mobile-phone">Telefon</label>
+                            <input type="tel" id="mobile-phone" name="mobile-phone">
+                        </div>
+                        <div class="form-group">
+                            <label for="mobile-message">Nachricht</label>
+                            <textarea id="mobile-message" name="mobile-message" rows="5" placeholder="Zusätzliche Wünsche oder Fragen..."></textarea>
+                        </div>
+                        <button type="submit" class="mobile-submit-btn">Anfrage senden</button>
+                    </div>
+                    
                     <button class="book-now">Zur Buchungsanfrage</button>
                 </div>
                 <div class="calendar-card">
@@ -255,8 +315,6 @@
             <div class="field-background-content">
                 <h1>Ferienwohnung Frieda</h1>
                 <h2>Wir freuen uns auf Sie</h2>
-                <p><br></p>
-                <p><br></p>
                 <div class="contact-cards">
                     <div class="contact-card">
                         <div class="contact-icon">📞</div>
@@ -284,15 +342,22 @@
             <div class="footercontent">                
                 <a href="#kite-background">Ferienwohnung Frieda</a>
             </div>
-            <p>&copy; 2025 Ferienwohnung Frieda. Built with ❤️ and code.</p>
-            <ul>
+            <p class="footer-copyright">&copy; 2025 Ferienwohnung Frieda. Built with ❤️ and code.</p>
+            <ul class="footer-menu">
                 <li><a href="legal.html#impressum-section">Impressum</a></li>
                 <li><a href="legal.html#privacy-section">Datenschutz</a></li>
+                <li class="footer-copyright-mobile"><span>&copy; 2025 Ferienwohnung Frieda. Built with ❤️ and code.</span></li>
             </ul>
+            <div class="footer-hamburger">
+                <span class="footer-bar"></span>
+                <span class="footer-bar"></span>
+                <span class="footer-bar"></span>
+            </div>
         </nav>
     </footer>
 
     <script src="js/calendar.js"></script>
     <script src="js/lightbox.js"></script>
+    <script src="js/mobile-menu.js"></script>
 </body>
 </html> 

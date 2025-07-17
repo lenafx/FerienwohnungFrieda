@@ -1,0 +1,218 @@
+// Mobile menu functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const hamburger = document.querySelector('.hamburger');
+    const navMenu = document.querySelector('.nav-menu');
+    const navLinks = document.querySelectorAll('.nav-menu a');
+
+    // Toggle mobile menu
+    hamburger.addEventListener('click', function() {
+        hamburger.classList.toggle('active');
+        navMenu.classList.toggle('active');
+    });
+
+    // Close mobile menu when clicking on a link
+    navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+        });
+    });
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!hamburger.contains(event.target) && !navMenu.contains(event.target)) {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+        }
+    });
+
+    // Close mobile menu on window resize if screen becomes larger
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+        }
+    });
+
+    // Footer mobile menu functionality
+    const footerHamburger = document.querySelector('.footer-hamburger');
+    const footerMenu = document.querySelector('.footer-menu');
+    const footerLinks = document.querySelectorAll('.footer-menu a');
+
+    // Toggle footer mobile menu
+    if (footerHamburger) {
+        footerHamburger.addEventListener('click', function() {
+            footerHamburger.classList.toggle('active');
+            footerMenu.classList.toggle('active');
+        });
+    }
+
+    // Close footer mobile menu when clicking on a link
+    footerLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            if (footerHamburger) {
+                footerHamburger.classList.remove('active');
+            }
+            footerMenu.classList.remove('active');
+        });
+    });
+
+    // Close footer mobile menu when clicking outside
+    document.addEventListener('click', function(event) {
+        if (footerHamburger && footerMenu) {
+            if (!footerHamburger.contains(event.target) && !footerMenu.contains(event.target)) {
+                footerHamburger.classList.remove('active');
+                footerMenu.classList.remove('active');
+            }
+        }
+    });
+
+    // Close footer mobile menu on window resize if screen becomes larger
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            if (footerHamburger) {
+                footerHamburger.classList.remove('active');
+            }
+            if (footerMenu) {
+                footerMenu.classList.remove('active');
+            }
+        }
+    });
+
+    // Text background swipe for mobile
+    function enableTextBackgroundSwipe() {
+        const slider = document.querySelector('.text-background-slider');
+        if (!slider) return;
+        const slides = slider.querySelectorAll('.text-background-slide');
+        if (slides.length < 2) return;
+        let current = 0;
+        let startX = null;
+        let isTouch = false;
+
+        function showSlide(idx) {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === idx);
+            });
+            
+            // Update indicators
+            const indicators = document.querySelectorAll('.swipe-indicators .indicator');
+            indicators.forEach((indicator, i) => {
+                indicator.classList.toggle('active', i === idx);
+            });
+            
+            // Hide/show text content based on slide
+            const textContent = document.querySelector('.text-background-content');
+            if (textContent) {
+                if (idx === 0) {
+                    // First slide - show text
+                    textContent.style.display = 'block';
+                    textContent.style.opacity = '1';
+                    textContent.style.visibility = 'visible';
+                } else {
+                    // All other slides - hide text
+                    textContent.style.display = 'none';
+                    textContent.style.opacity = '0';
+                    textContent.style.visibility = 'hidden';
+                }
+            }
+        }
+
+        function onTouchStart(e) {
+            if (window.innerWidth > 768) return;
+            isTouch = true;
+            startX = e.touches ? e.touches[0].clientX : e.clientX;
+        }
+        function onTouchMove(e) {
+            if (!isTouch) return;
+            e.preventDefault();
+        }
+        function onTouchEnd(e) {
+            if (!isTouch || startX === null) return;
+            let endX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+            let diff = endX - startX;
+            if (Math.abs(diff) > 50) {
+                if (diff < 0) {
+                    // swipe left
+                    current = (current + 1) % slides.length;
+                } else {
+                    // swipe right
+                    current = (current - 1 + slides.length) % slides.length;
+                }
+                showSlide(current);
+            }
+            isTouch = false;
+            startX = null;
+        }
+
+        slider.addEventListener('touchstart', onTouchStart);
+        slider.addEventListener('touchmove', onTouchMove, { passive: false });
+        slider.addEventListener('touchend', onTouchEnd);
+        slider.addEventListener('mousedown', onTouchStart);
+        slider.addEventListener('mouseup', onTouchEnd);
+
+        // Add click handlers for indicators
+        const indicators = document.querySelectorAll('.swipe-indicators .indicator');
+        indicators.forEach((indicator, i) => {
+            indicator.addEventListener('click', function() {
+                current = i;
+                showSlide(current);
+            });
+        });
+
+        // Reset to first slide on resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                showSlide(0);
+            }
+        });
+    }
+
+    enableTextBackgroundSwipe();
+    
+    // Mobile booking form functionality
+    function setupMobileBookingForm() {
+        const mobileSubmitBtn = document.querySelector('.mobile-submit-btn');
+        const originalForm = document.getElementById('booking-form');
+        
+        if (mobileSubmitBtn && originalForm) {
+            mobileSubmitBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Sync data from mobile form to original form
+                const mobileName = document.getElementById('mobile-name');
+                const mobileEmail = document.getElementById('mobile-email');
+                const mobilePhone = document.getElementById('mobile-phone');
+                const mobileMessage = document.getElementById('mobile-message');
+                
+                const originalName = document.getElementById('name');
+                const originalEmail = document.getElementById('email');
+                const originalPhone = document.getElementById('phone');
+                const originalMessage = document.getElementById('message');
+                
+                // Copy values from mobile form to original form
+                if (originalName && mobileName) originalName.value = mobileName.value;
+                if (originalEmail && mobileEmail) originalEmail.value = mobileEmail.value;
+                if (originalPhone && mobilePhone) originalPhone.value = mobilePhone.value;
+                if (originalMessage && mobileMessage) originalMessage.value = mobileMessage.value;
+                
+                // Sync booking dates and guests
+                const summaryCheckin = document.getElementById('summary-checkin');
+                const summaryCheckout = document.getElementById('summary-checkout');
+                const summaryGuests = document.getElementById('summary-guests');
+                
+                const originalCheckin = document.getElementById('checkin');
+                const originalCheckout = document.getElementById('checkout');
+                const originalGuests = document.getElementById('guests');
+                
+                if (originalCheckin && summaryCheckin) originalCheckin.value = summaryCheckin.value;
+                if (originalCheckout && summaryCheckout) originalCheckout.value = summaryCheckout.value;
+                if (originalGuests && summaryGuests) originalGuests.value = summaryGuests.value;
+                
+                // Submit the original form
+                originalForm.submit();
+            });
+        }
+    }
+    
+    setupMobileBookingForm();
+}); 

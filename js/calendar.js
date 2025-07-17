@@ -545,7 +545,7 @@ class BookingCalendar {
 
         costDisplay.innerHTML = `
             <div class="cost-item">
-                <span>Unterkunft (${nights} Nacht${nights > 1 ? 'e' : ''} × ${nightlyRate}€)</span>
+                <span>Unterkunft (${nights} Nächt${nights > 1 ? 'e' : ''} × ${nightlyRate}€)</span>
                 <span>${accommodationCost.toFixed(2)}€</span>
             </div>
             <div class="cost-item">
