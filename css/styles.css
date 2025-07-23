@@ -326,13 +326,17 @@ main {
     hyphens: auto;
 }
 
+.contact-card.contact-card-address a {
+    color: #fff;
+}
+
 .contact-cards .contact-card a:hover {
-    color: #2980b9;
+    color: #003366;
     text-decoration: underline;
 }
 
 .contact-card-address {
-    background-image: url('../images/maps.png');
+    background-image: url('../images/maps02.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -355,14 +359,13 @@ main {
 
 .contact-card.contact-card-address {
     background: none;
-    background-image: url('../images/maps.png');
+    background-image: url('../images/maps02.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     position: relative;
     color: #fff;
 }
-
 
 section {
     scroll-margin-top: var(--header-height);
