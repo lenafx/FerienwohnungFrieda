@@ -475,6 +475,16 @@
     color: #181818;
 }
 
+.cost-header {
+    text-align: left;
+    margin: 1.2rem 0 0.5rem 0;
+    color: #2c3e50;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-top: 1.8rem;
+    margin-bottom: -1.2rem;
+}
+
 #desktop-cost-card {
     display: none;
 }
@@ -528,6 +538,51 @@
     }
     .calendar-card h3 {
         text-align: center;
-        margin-bottom: -1rem;
+        margin-bottom: -1.2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    #booking-summary .cost-calculation {
+        background: transparent !important;
+        border: none !important;
+    }
+    #booking-summary .cost-item.total {
+        justify-content: flex-start;
+        color: #2c3e50;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0;
+    }
+    #booking-summary .cost-item.total span:first-child,
+    #booking-summary .cost-item.total span:last-child {
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    #booking-summary .cost-item.total span:last-child {
+        margin-left: 1.2rem;
+        text-align: right;
+        margin-left: auto !important;
+    }
+    #booking-summary .cost-item.total span:last-child:empty:after {
+        content: '–';
+        display: inline-block;
+        text-align: right;
+        width: 100%;
+        margin-left: auto !important;
+    }
+    #booking-summary .guest-select {
+        font-size: 1.2rem;
+        padding: 0.75rem;
+    }
+}
+
+@media (min-width: 769px) {
+    .cost-item.total,
+    .cost-item.total span:first-child,
+    .cost-item.total span:last-child {
+        font-size: 1.1rem;
+        color: #2c3e50;
     }
 }

@@ -1159,6 +1159,15 @@ footer a:hover {
         font-size: 1rem;
         margin-bottom: 0;
     }
+    .mobile-header {
+        box-shadow: none !important;
+    }
+
+    .text-section,
+    .location-section {
+        box-shadow: none !important;
+        margin-top: -1.2rem;
+    }
 } 
 
 /* Text background slider for mobile */
