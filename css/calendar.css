@@ -193,6 +193,7 @@
 #booking-summary h3 {
     margin-top: 0;
     color: #2c3e50;
+    text-align: center;
 }
 
 .book-now {
@@ -524,5 +525,9 @@
         display: flex;
         flex-direction: column;
         justify-content: stretch;
+    }
+    .calendar-card h3 {
+        text-align: center;
+        margin-bottom: -1rem;
     }
 }

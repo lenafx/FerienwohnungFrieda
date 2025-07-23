@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const diffY = Math.abs(moveY - startY);
             // Only prevent default if horizontal swipe is dominant
             if (diffX > 10 && diffX > diffY) {
-                e.preventDefault();
+            e.preventDefault();
                 isScrolling = false;
             } else {
                 isScrolling = true;
