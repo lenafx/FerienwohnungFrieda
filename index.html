@@ -178,7 +178,55 @@
 
         <section id="calendar-section" class="calendar-section">
             <div class="booking-container">
-                <div id="booking-calendar"></div>
+                <div class="calendar-left-col">
+                    <div id="booking-calendar"></div>
+                    <div id="desktop-cost-card" class="cost-calculation-card">
+                      <h3>Kostenübersicht</h3>
+                      <div class="cost-calculation"></div>
+                    </div>
+                </div>
+                <div class="calendar-card">
+                    <!-- <div class="calendar-icon">✉️</div> -->
+                    <h3>Buchungsanfrage</h3>
+                    <form id="booking-form" class="booking-form" action="https://formspree.io/f/xjkoyvzn" method="POST">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="checkin">Anreise *</label>
+                                <input type="text" id="checkin" name="checkin" required placeholder="DD.MM.YYYY">
+                            </div>
+                            <div class="form-group">
+                                <label for="checkout">Abreise *</label>
+                                <input type="text" id="checkout" name="checkout" required placeholder="DD.MM.YYYY">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="guests">Anzahl Gäste *</label>
+                            <select id="guests" name="guests" required>
+                                <option value="">Bitte wählen</option>
+                                <option value="1">1 Person</option>
+                                <option value="2">2 Personen</option>
+                                <option value="3">3 Personen</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="name">Name *</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">E-Mail *</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Telefon</label>
+                            <input type="tel" id="phone" name="phone">
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Nachricht</label>
+                            <textarea id="message" name="message" rows="4" placeholder="Zusätzliche Wünsche oder Fragen..."></textarea>
+                        </div>
+                        <button type="submit" class="submit-btn">Anfrage senden</button>
+                    </form>
+                </div>
                 <div id="booking-summary">
                     <h3>Buchungsübersicht</h3>
                     <div class="form-group">
@@ -206,7 +254,7 @@
                     </div>
                     
                     <!-- Mobile form fields -->
-                    <div class="mobile-form-fields">
+                    <form id="mobile-booking-form" class="mobile-form-fields" action="https://formspree.io/f/xjkoyvzn" method="POST">
                         <div class="form-group">
                             <label for="mobile-name">Name *</label>
                             <input type="text" id="mobile-name" name="mobile-name" required>
@@ -224,51 +272,9 @@
                             <textarea id="mobile-message" name="mobile-message" rows="5" placeholder="Zusätzliche Wünsche oder Fragen..."></textarea>
                         </div>
                         <button type="submit" class="mobile-submit-btn">Anfrage senden</button>
-                    </div>
+                    </form>
                     
                     <button class="book-now">Zur Buchungsanfrage</button>
-                </div>
-                <div class="calendar-card">
-                    <!-- <div class="calendar-icon">✉️</div> -->
-                    <h3>Buchungsanfrage</h3>
-                    <form id="booking-form" class="booking-form">
-                        <div class="form-group">
-                            <label for="name">Name *</label>
-                            <input type="text" id="name" name="name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">E-Mail *</label>
-                            <input type="email" id="email" name="email" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="phone">Telefon</label>
-                            <input type="tel" id="phone" name="phone">
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="checkin">Anreise *</label>
-                                <input type="text" id="checkin" name="checkin" required placeholder="DD.MM.YYYY">
-                            </div>
-                            <div class="form-group">
-                                <label for="checkout">Abreise *</label>
-                                <input type="text" id="checkout" name="checkout" required placeholder="DD.MM.YYYY">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="guests">Anzahl Gäste *</label>
-                            <select id="guests" name="guests" required>
-                                <option value="">Bitte wählen</option>
-                                <option value="1">1 Person</option>
-                                <option value="2">2 Personen</option>
-                                <option value="3">3 Personen</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="message">Nachricht</label>
-                            <textarea id="message" name="message" rows="4" placeholder="Zusätzliche Wünsche oder Fragen..."></textarea>
-                        </div>
-                        <button type="submit" class="submit-btn">Anfrage senden</button>
-                    </form>
                 </div>
             </div>
         </section>
@@ -321,18 +327,17 @@
                         <h3>Telefon</h3>
                         <p><a href="tel:+4915153793837">+49 151 53793837</a></p>
                     </div>
-                    
                     <div class="contact-card">
                         <div class="contact-icon">✉️</div>
                         <h3>E-Mail</h3>
                         <p><a href="mailto:flensburgferien@gmail.com">flensburgferien@gmail.com</a></p>
-                    </div>
-                    
-                    <div class="contact-card">
+                    </div>                    
+                    <div class="contact-card contact-card-address">
                         <div class="contact-icon">📍</div>
                         <h3>Adresse</h3>
                         <p>Friedastraße 19<br>24937 Flensburg</p>
                     </div>
+
                 </div>
             </div>
         </section>

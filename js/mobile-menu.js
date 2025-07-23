@@ -169,50 +169,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
     enableTextBackgroundSwipe();
     
-    // Mobile booking form functionality
-    function setupMobileBookingForm() {
-        const mobileSubmitBtn = document.querySelector('.mobile-submit-btn');
-        const originalForm = document.getElementById('booking-form');
-        
-        if (mobileSubmitBtn && originalForm) {
-            mobileSubmitBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                // Sync data from mobile form to original form
-                const mobileName = document.getElementById('mobile-name');
-                const mobileEmail = document.getElementById('mobile-email');
-                const mobilePhone = document.getElementById('mobile-phone');
-                const mobileMessage = document.getElementById('mobile-message');
-                
-                const originalName = document.getElementById('name');
-                const originalEmail = document.getElementById('email');
-                const originalPhone = document.getElementById('phone');
-                const originalMessage = document.getElementById('message');
-                
-                // Copy values from mobile form to original form
-                if (originalName && mobileName) originalName.value = mobileName.value;
-                if (originalEmail && mobileEmail) originalEmail.value = mobileEmail.value;
-                if (originalPhone && mobilePhone) originalPhone.value = mobilePhone.value;
-                if (originalMessage && mobileMessage) originalMessage.value = mobileMessage.value;
-                
-                // Sync booking dates and guests
-                const summaryCheckin = document.getElementById('summary-checkin');
-                const summaryCheckout = document.getElementById('summary-checkout');
-                const summaryGuests = document.getElementById('summary-guests');
-                
-                const originalCheckin = document.getElementById('checkin');
-                const originalCheckout = document.getElementById('checkout');
-                const originalGuests = document.getElementById('guests');
-                
-                if (originalCheckin && summaryCheckin) originalCheckin.value = summaryCheckin.value;
-                if (originalCheckout && summaryCheckout) originalCheckout.value = summaryCheckout.value;
-                if (originalGuests && summaryGuests) originalGuests.value = summaryGuests.value;
-                
-                // Submit the original form
-                originalForm.submit();
-            });
-        }
-    }
-    
-    setupMobileBookingForm();
+    // Mobile booking form direct submission (removed for Formspree integration)
 }); 

@@ -527,12 +527,37 @@ class BookingCalendar {
 
         const guestSelect = summary.querySelector('#summary-guests');
         const costDisplay = summary.querySelector('.cost-calculation');
+        const desktopCard = document.getElementById('desktop-cost-card');
+        const desktopCostDisplay = desktopCard ? desktopCard.querySelector('.cost-calculation') : null;
         
-        if (!guestSelect || !costDisplay) return;
-
-        const guests = guestSelect.value;
+        // Always show placeholders in desktop card if not enough info
+        let guests = guestSelect ? guestSelect.value : '';
+        let html = '';
         if (!guests || nights <= 0) {
-            costDisplay.innerHTML = '';
+            html = `
+                <div class="cost-item">
+                    <span>Unterkunft (– Nächte × – €)</span>
+                    <span>–</span>
+                </div>
+                <div class="cost-item">
+                    <span>Bettwäsche</span>
+                    <span>–</span>
+                </div>
+                <div class="cost-item subtotal">
+                    <span>Zwischensumme</span>
+                    <span>–</span>
+                </div>
+                <div class="cost-item">
+                    <span>Endreinigung</span>
+                    <span>–</span>
+                </div>
+                <div class="cost-item total">
+                    <span>Gesamtpreis</span>
+                    <span>–</span>
+                </div>
+            `;
+            if (costDisplay) costDisplay.innerHTML = '';
+            if (desktopCostDisplay && window.innerWidth >= 769) desktopCostDisplay.innerHTML = html;
             return;
         }
 
@@ -543,7 +568,7 @@ class BookingCalendar {
         const cleaningFee = 60;
         const total = subtotal + cleaningFee;
 
-        costDisplay.innerHTML = `
+        html = `
             <div class="cost-item">
                 <span>Unterkunft (${nights} Nächt${nights > 1 ? 'e' : ''} × ${nightlyRate}€)</span>
                 <span>${accommodationCost.toFixed(2)}€</span>
@@ -565,6 +590,8 @@ class BookingCalendar {
                 <span>${total.toFixed(2)}€</span>
             </div>
         `;
+        if (costDisplay) costDisplay.innerHTML = html;
+        if (desktopCostDisplay && window.innerWidth >= 769) desktopCostDisplay.innerHTML = html;
     }
 
     formatDate(date) {
@@ -605,6 +632,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Initialize summary date inputs
     initSummaryDateInputs();
+
+    // Ensure desktop cost card always shows placeholders on load
+    const calendar = window.bookingCalendar;
+    if (calendar) {
+        calendar.updateCostCalculation(0);
+    }
 });
 
 function initBookingForm() {
@@ -699,57 +732,7 @@ function initBookingForm() {
         });
     }
     
-    // Handle form submission
-    bookingForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const formData = new FormData(bookingForm);
-        const bookingData = {
-            name: formData.get('name'),
-            email: formData.get('email'),
-            phone: formData.get('phone'),
-            checkin: formData.get('checkin'),
-            checkout: formData.get('checkout'),
-            guests: formData.get('guests'),
-            message: formData.get('message')
-        };
-        
-        // Validate dates using European format
-        const calendar = window.bookingCalendar;
-        const checkin = calendar.parseEuropeanDate(bookingData.checkin);
-        const checkout = calendar.parseEuropeanDate(bookingData.checkout);
-        
-        if (!checkin || !checkout) {
-            alert('Bitte geben Sie gültige Daten im Format DD.MM.YYYY ein.');
-            return;
-        }
-        
-        if (checkout <= checkin) {
-            alert('Das Abreisedatum muss nach dem Anreisedatum liegen.');
-            return;
-        }
-        
-        // Enforce minimum booking period of 3 nights
-        const nights = Math.ceil((checkout - checkin) / (1000 * 60 * 60 * 24));
-        if (nights < 3) {
-            alert('Die Mindestaufenthaltsdauer beträgt 3 Nächte.');
-            return;
-        }
-        // Check for unavailable dates in the range
-        if (calendar.isRangeUnavailable(checkin, checkout)) {
-            alert('Der gewählte Zeitraum enthält nicht verfügbare Tage.');
-            return;
-        }
-        
-        // Simulate form submission
-        console.log('Booking request:', bookingData);
-        
-        // Show success message
-        alert('Vielen Dank für Ihre Anfrage! Wir werden uns innerhalb von 24 Stunden bei Ihnen melden.');
-        
-        // Reset form
-        bookingForm.reset();
-    });
+    // Handle form submission (removed for Formspree integration)
     
     // Update checkout minimum date when checkin changes
     if (checkinInput && checkoutInput) {
