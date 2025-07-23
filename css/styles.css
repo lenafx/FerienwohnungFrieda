@@ -1168,6 +1168,18 @@ footer a:hover {
         box-shadow: none !important;
         margin-top: -1.2rem;
     }
+    .field-background {
+        overflow: hidden;
+    }
+    .contact-cards {
+        width: 100%;
+        max-width: 100vw;
+    }
+    .contact-cards .contact-card {
+        max-width: 90vw;
+        width: 100%;
+        box-sizing: border-box;
+    }
 } 
 
 /* Text background slider for mobile */

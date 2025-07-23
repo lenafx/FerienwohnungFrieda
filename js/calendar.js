@@ -540,7 +540,7 @@ class BookingCalendar {
                     <span>–</span>
                 </div>
                 <div class="cost-item">
-                    <span>Bettwäsche</span>
+                    <span>Bettwäsche und Handtücher</span>
                     <span>–</span>
                 </div>
                 <div class="cost-item subtotal">
@@ -574,7 +574,7 @@ class BookingCalendar {
                 <span>${accommodationCost.toFixed(2)}€</span>
             </div>
             <div class="cost-item">
-                <span>Bettwäsche</span>
+                <span>Bettwäsche und Handtücher</span>
                 <span>${bedsheetFee.toFixed(2)}€</span>
             </div>
             <div class="cost-item subtotal">
@@ -592,6 +592,45 @@ class BookingCalendar {
         `;
         if (costDisplay) costDisplay.innerHTML = html;
         if (desktopCostDisplay) desktopCostDisplay.innerHTML = html;
+
+        // Also update the hidden cost-summary field for email
+        const costSummaryInput = document.getElementById('cost-summary');
+        if (costSummaryInput) {
+            let summaryText = '';
+            summaryText += `Unterkunft: ${nights} Nächt${nights > 1 ? 'e' : ''} × ${nightlyRate}€ = ${accommodationCost.toFixed(2)}€\n`;
+            summaryText += `Bettwäsche und Handtücher: ${bedsheetFee.toFixed(2)}€\n`;
+            summaryText += `Zwischensumme: ${subtotal.toFixed(2)}€\n`;
+            summaryText += `Endreinigung: ${cleaningFee.toFixed(2)}€\n`;
+            summaryText += `Gesamtpreis: ${total.toFixed(2)}€`;
+            costSummaryInput.value = summaryText;
+        }
+
+        // Also update the hidden mobile form fields for email consistency
+        const mobileCheckin = document.getElementById('mobile-checkin');
+        const mobileCheckout = document.getElementById('mobile-checkout');
+        const mobileGuests = document.getElementById('mobile-guests');
+        const mobileCostSummary = document.getElementById('mobile-cost-summary');
+        if (mobileCheckin) {
+            mobileCheckin.value = this.selectedDates.start ? this.formatDateForInput(this.selectedDates.start) : '';
+        }
+        if (mobileCheckout) {
+            mobileCheckout.value = this.selectedDates.end ? this.formatDateForInput(this.selectedDates.end) : '';
+        }
+        if (mobileGuests) {
+            // Try to get from summary guests select, fallback to main guests select
+            const summaryGuests = document.getElementById('summary-guests');
+            const mainGuests = document.getElementById('guests');
+            mobileGuests.value = (summaryGuests && summaryGuests.value) ? summaryGuests.value : (mainGuests && mainGuests.value ? mainGuests.value : '');
+        }
+        if (mobileCostSummary) {
+            let summaryText = '';
+            summaryText += `Unterkunft: ${nights} Nächt${nights > 1 ? 'e' : ''} × ${nightlyRate}€ = ${accommodationCost.toFixed(2)}€\n`;
+            summaryText += `Bettwäsche und Handtücher: ${bedsheetFee.toFixed(2)}€\n`;
+            summaryText += `Zwischensumme: ${subtotal.toFixed(2)}€\n`;
+            summaryText += `Endreinigung: ${cleaningFee.toFixed(2)}€\n`;
+            summaryText += `Gesamtpreis: ${total.toFixed(2)}€`;
+            mobileCostSummary.value = summaryText;
+        }
     }
 
     formatDate(date) {

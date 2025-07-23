@@ -26,7 +26,7 @@
                 <a href="#kite-background">Ferienwohnung Frieda</a>
             </div>
             <ul class="nav-menu">
-                <li><a href="#text-background">Bilder</a></li>
+                <li><a href="#image-gallery">Bilder</a></li>
                 <li><a href="#text-section">Ferienwohnung</a></li>
                 <li><a href="#calendar-section">Verfügbarkeit</a></li>
                 <li><a href="#location-section">Flensburg</a></li>
@@ -130,7 +130,7 @@
 
                 <div class="description">
                     <h3>Schlafzimmer</h3>
-                    <p>Sie verfügt über ein Schlafzimmer mit Doppelbett (160 cm) sowie ein angrenzendes (Kinder)Schlafzimmer mit einem Einzelbett.</p>
+                    <p>Sie verfügt über ein Schlafzimmer mit Doppelbett sowie ein angrenzendes separates Schlafzimmer mit einem Einzelbett.</p>
                 </div>
 
                 <div class="description">
@@ -162,7 +162,7 @@
                 <div class="description">
                     <h3>Zugang zur Wohnung</h3>
                     <p>Der Schlüssel ist in einer Box neben der Haustür zu finden. Den Zahlencode hierfür erhalten Sie am Anreisetag per E-Mail. Selbstverständlich bin ich bei Fragen telefonisch erreichbar.</p>
-                    <p>Einchecken ist ab 15 Uhr, Auschecken bis 11 Uhr möglich.</p>
+                    <p>Einchecken ist ab 15 Uhr, Auschecken bis spätestens 11 Uhr möglich.</p>
                 </div>
         
                 <div class="description">
@@ -172,7 +172,7 @@
                 
                 <div class="description">
                     <h3>Weitere Informationen</h3>
-                    <p>W-Lan, Handtücher und die Bettensteuer sind inklusive.</p>
+                    <p>Die Bettensteuer ist inklusive.</p>
                     <p>Die Mindestaufenthaltsdauer beträgt 3 Nächte.</p>
                 </div>
             </div>            
@@ -233,6 +233,7 @@
                             <label for="message">Nachricht</label>
                             <textarea id="message" name="message" rows="4" placeholder="Zusätzliche Wünsche oder Fragen..."></textarea>
                         </div>
+                        <input type="hidden" id="cost-summary" name="cost-summary" value="">
                         <button type="submit" class="submit-btn">Anfrage senden</button>
                     </form>
                 </div>
@@ -268,20 +269,24 @@
                     <form id="mobile-booking-form" class="mobile-form-fields" action="https://formspree.io/f/xjkoyvzn" method="POST">
                         <div class="form-group">
                             <label for="mobile-name">Name *</label>
-                            <input type="text" id="mobile-name" name="mobile-name" required>
+                            <input type="text" id="mobile-name" name="name" required>
                         </div>
                         <div class="form-group">
                             <label for="mobile-email">E-Mail *</label>
-                            <input type="email" id="mobile-email" name="mobile-email" required>
+                            <input type="email" id="mobile-email" name="email" required>
                         </div>
                         <div class="form-group">
                             <label for="mobile-phone">Telefon</label>
-                            <input type="tel" id="mobile-phone" name="mobile-phone">
+                            <input type="tel" id="mobile-phone" name="phone">
                         </div>
                         <div class="form-group">
                             <label for="mobile-message">Nachricht</label>
-                            <textarea id="mobile-message" name="mobile-message" rows="5" placeholder="Zusätzliche Wünsche oder Fragen..."></textarea>
+                            <textarea id="mobile-message" name="message" rows="5" placeholder="Zusätzliche Wünsche oder Fragen..."></textarea>
                         </div>
+                        <input type="hidden" id="mobile-checkin" name="checkin" value="">
+                        <input type="hidden" id="mobile-checkout" name="checkout" value="">
+                        <input type="hidden" id="mobile-guests" name="guests" value="">
+                        <input type="hidden" id="mobile-cost-summary" name="cost-summary" value="">
                         <button type="submit" class="mobile-submit-btn">Anfrage senden</button>
                     </form>
                     
