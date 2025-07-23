@@ -556,8 +556,8 @@ class BookingCalendar {
                     <span>–</span>
                 </div>
             `;
-            if (costDisplay) costDisplay.innerHTML = '';
-            if (desktopCostDisplay && window.innerWidth >= 769) desktopCostDisplay.innerHTML = html;
+            if (costDisplay) costDisplay.innerHTML = html;
+            if (desktopCostDisplay) desktopCostDisplay.innerHTML = html;
             return;
         }
 
@@ -591,7 +591,7 @@ class BookingCalendar {
             </div>
         `;
         if (costDisplay) costDisplay.innerHTML = html;
-        if (desktopCostDisplay && window.innerWidth >= 769) desktopCostDisplay.innerHTML = html;
+        if (desktopCostDisplay) desktopCostDisplay.innerHTML = html;
     }
 
     formatDate(date) {
@@ -638,6 +638,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (calendar) {
         calendar.updateCostCalculation(0);
     }
+
+    // Add event listeners for all reset buttons
+    document.querySelectorAll('.reset-btn').forEach(btn => {
+        btn.addEventListener('click', resetDateSelection);
+    });
 });
 
 function initBookingForm() {
@@ -849,6 +854,7 @@ function resetDateSelection() {
     if (summaryCheckinInput) summaryCheckinInput.value = '';
     if (summaryCheckoutInput) summaryCheckoutInput.value = '';
     calendar.renderCalendar();
+    calendar.setupNavigationListeners(); // Ensure navigation buttons are reattached after reset
     calendar.updateBookingSummary();
 }
 

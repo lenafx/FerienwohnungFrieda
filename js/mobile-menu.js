@@ -87,7 +87,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (slides.length < 2) return;
         let current = 0;
         let startX = null;
+        let startY = null;
         let isTouch = false;
+        let isScrolling = false;
 
         function showSlide(idx) {
             slides.forEach((slide, i) => {
@@ -121,17 +123,31 @@ document.addEventListener('DOMContentLoaded', function() {
             if (window.innerWidth > 768) return;
             isTouch = true;
             startX = e.touches ? e.touches[0].clientX : e.clientX;
+            startY = e.touches ? e.touches[0].clientY : e.clientY;
+            isScrolling = false;
         }
         function onTouchMove(e) {
-            if (!isTouch) return;
-            e.preventDefault();
+            if (!isTouch || startX === null || startY === null) return;
+            const moveX = e.touches ? e.touches[0].clientX : e.clientX;
+            const moveY = e.touches ? e.touches[0].clientY : e.clientY;
+            const diffX = Math.abs(moveX - startX);
+            const diffY = Math.abs(moveY - startY);
+            // Only prevent default if horizontal swipe is dominant
+            if (diffX > 10 && diffX > diffY) {
+                e.preventDefault();
+                isScrolling = false;
+            } else {
+                isScrolling = true;
+            }
         }
         function onTouchEnd(e) {
-            if (!isTouch || startX === null) return;
+            if (!isTouch || startX === null || startY === null) return;
             let endX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
-            let diff = endX - startX;
-            if (Math.abs(diff) > 50) {
-                if (diff < 0) {
+            let endY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+            let diffX = endX - startX;
+            let diffY = endY - startY;
+            if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY)) {
+                if (diffX < 0) {
                     // swipe left
                     current = (current + 1) % slides.length;
                 } else {
@@ -142,6 +158,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             isTouch = false;
             startX = null;
+            startY = null;
+            isScrolling = false;
         }
 
         slider.addEventListener('touchstart', onTouchStart);

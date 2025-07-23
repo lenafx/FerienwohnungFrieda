@@ -329,6 +329,25 @@
     background: #2980b9;
 }
 
+.reset-btn {
+    background: #b71c1c;
+    color: white;
+    border: none;
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%;
+    margin-top: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+
+.reset-btn:hover {
+    background: #7f0000;
+}
+
 /* Guest Selection Styles */
 .guest-selection {
     margin: 1rem 0;

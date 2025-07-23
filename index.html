@@ -184,9 +184,9 @@
                     </div>
                 </div>
                 <div class="calendar-card">
-                    <!-- <div class="calendar-icon">✉️</div> -->
                     <h3>Buchungsanfrage</h3>
                     <form id="booking-form" class="booking-form" action="https://formspree.io/f/xjkoyvzn" method="POST">
+                        <button type="button" class="reset-btn">Auswahl zurücksetzen</button>
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="checkin">Anreise *</label>
@@ -227,6 +227,7 @@
                 </div>
                 <div id="booking-summary">
                     <h3>Buchungsübersicht</h3>
+                    <button type="button" class="reset-btn">Auswahl zurücksetzen</button>
                     <div class="form-group">
                         <label for="summary-checkin">Anreise *</label>
                         <input type="text" id="summary-checkin" value="" placeholder="DD.MM.YYYY" required>
