@@ -176,7 +176,7 @@ main {
     height: calc(100vh - var(--header-height));
     background-size: cover;
     background-position: center;
-    background-attachment: fixed;
+    /* background-attachment: fixed; */
     display: flex;
     align-items: center;
     justify-content: center;
