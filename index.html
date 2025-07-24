@@ -211,11 +211,14 @@
                         <div class="form-group">
                             <label for="guests">Anzahl Gäste *</label>
                             <select id="guests" name="guests" required>
-                                <option value="">Bitte wählen</option>
-                                <option value="1">1 Person</option>
                                 <option value="2">2 Personen</option>
+                                <option value="1">1 Person</option>
                                 <option value="3">3 Personen</option>
                             </select>
+                        </div>
+                        <div id="mobile-cost-card">
+                            <h4 class="cost-header">Kostenübersicht</h4>
+                            <div class="cost-calculation"></div>
                         </div>
                         <div class="form-group">
                             <label for="name">Name *</label>
@@ -236,11 +239,6 @@
                         <input type="hidden" id="cost-summary" name="cost-summary" value="">
                         <button type="submit" class="submit-btn">Anfrage senden</button>
                     </form>
-                </div>
-                <div id="booking-summary">
-                    <h4 class="cost-header">Kostenübersicht</h4>
-                    <div class="cost-calculation">
-                    </div>
                 </div>
             </div>
         </section>

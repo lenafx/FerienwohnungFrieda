@@ -399,7 +399,7 @@ class BookingCalendar {
     }
 
     updateBookingSummary() {
-        const summary = document.getElementById('booking-summary');
+        const summary = document.getElementById('mobile-cost-card');
         if (!summary) return;
 
         // Get values from the main booking form
@@ -480,18 +480,14 @@ class BookingCalendar {
     }
 
     updateCostCalculation(nights, guestsOverride) {
-        const summary = document.getElementById('booking-summary');
-        if (!summary) return;
-
         // Always get guests from the main booking form
         let guests = guestsOverride;
         if (!guests) {
             const guestSelect = document.getElementById('guests');
             guests = guestSelect ? guestSelect.value : '';
         }
-        const costDisplay = summary.querySelector('.cost-calculation');
-        const desktopCard = document.getElementById('desktop-cost-card');
-        const desktopCostDisplay = desktopCard ? desktopCard.querySelector('.cost-calculation') : null;
+
+        // Prepare HTML for cost calculation
         let html = '';
         if (!guests || nights <= 0) {
             html = `
@@ -516,53 +512,50 @@ class BookingCalendar {
                     <span>–</span>
                 </div>
             `;
-            if (costDisplay) costDisplay.innerHTML = html;
-            if (desktopCostDisplay) desktopCostDisplay.innerHTML = html;
-            return;
+        } else {
+            const nightlyRate = this.calculateNightlyRate(guests);
+            const accommodationCost = nightlyRate * nights;
+            const bedsheetFee = 10 * guests;
+            const subtotal = accommodationCost + bedsheetFee;
+            const cleaningFee = 60;
+            const total = subtotal + cleaningFee;
+
+            html = `
+                <div class="cost-item">
+                    <span>Unterkunft (${nights} Nächt${nights > 1 ? 'e' : ''} × ${nightlyRate}€ / ${guests} Person${guests > 1 ? 'en' : ''})</span>
+                    <span>${accommodationCost.toFixed(2)}€</span>
+                </div>
+                <div class="cost-item">
+                    <span>Bettwäsche und Handtücher</span>
+                    <span>${bedsheetFee.toFixed(2)}€</span>
+                </div>
+                <div class="cost-item subtotal">
+                    <span>Zwischensumme</span>
+                    <span>${subtotal.toFixed(2)}€</span>
+                </div>
+                <div class="cost-item">
+                    <span>Endreinigung</span>
+                    <span>${cleaningFee.toFixed(2)}€</span>
+                </div>
+                <div class="cost-item total">
+                    <span>Gesamtpreis</span>
+                    <span>${total.toFixed(2)}€</span>
+                </div>
+            `;
         }
 
-        const nightlyRate = this.calculateNightlyRate(guests);
-        const accommodationCost = nightlyRate * nights;
-        const bedsheetFee = 10*guests;
-        const subtotal = accommodationCost + bedsheetFee;
-        const cleaningFee = 60;
-        const total = subtotal + cleaningFee;
+        // Update mobile-cost-card if it exists
+        const summary = document.getElementById('mobile-cost-card');
+        if (summary) {
+            const costDisplay = summary.querySelector('.cost-calculation');
+            if (costDisplay) costDisplay.innerHTML = html;
+        }
 
-        html = `
-            <div class="cost-item">
-                <span>Unterkunft (${nights} Nächt${nights > 1 ? 'e' : ''} × ${nightlyRate}€)</span>
-                <span>${accommodationCost.toFixed(2)}€</span>
-            </div>
-            <div class="cost-item">
-                <span>Bettwäsche und Handtücher</span>
-                <span>${bedsheetFee.toFixed(2)}€</span>
-            </div>
-            <div class="cost-item subtotal">
-                <span>Zwischensumme</span>
-                <span>${subtotal.toFixed(2)}€</span>
-            </div>
-            <div class="cost-item">
-                <span>Endreinigung</span>
-                <span>${cleaningFee.toFixed(2)}€</span>
-            </div>
-            <div class="cost-item total">
-                <span>Gesamtpreis</span>
-                <span>${total.toFixed(2)}€</span>
-            </div>
-        `;
-        if (costDisplay) costDisplay.innerHTML = html;
-        if (desktopCostDisplay) desktopCostDisplay.innerHTML = html;
-
-        // Also update the hidden cost-summary field for email
-        const costSummaryInput = document.getElementById('cost-summary');
-        if (costSummaryInput) {
-            let summaryText = '';
-            summaryText += `Unterkunft: ${nights} Nächt${nights > 1 ? 'e' : ''} × ${nightlyRate}€ = ${accommodationCost.toFixed(2)}€\n`;
-            summaryText += `Bettwäsche und Handtücher: ${bedsheetFee.toFixed(2)}€\n`;
-            summaryText += `Zwischensumme: ${subtotal.toFixed(2)}€\n`;
-            summaryText += `Endreinigung: ${cleaningFee.toFixed(2)}€\n`;
-            summaryText += `Gesamtpreis: ${total.toFixed(2)}€`;
-            costSummaryInput.value = summaryText;
+        // Update desktop-cost-card if it exists
+        const desktopCard = document.getElementById('desktop-cost-card');
+        if (desktopCard) {
+            const desktopCostDisplay = desktopCard.querySelector('.cost-calculation');
+            if (desktopCostDisplay) desktopCostDisplay.innerHTML = html;
         }
     }
 
