@@ -1056,60 +1056,16 @@ footer a:hover {
     .mobile-form-fields {
         display: none;
     }
-    
     .calendar-card {
         display: block;
     }
-    
     @media (max-width: 768px) {
-        .mobile-form-fields {
-            display: block;
-            margin-top: var(--space-lg);
-            padding-top: var(--space-lg);
-            border-top: 1px solid #e1e8ed;
-        }
-        
-        .mobile-form-fields .form-group {
-            margin-bottom: var(--space-md);
-        }
-        
-        .mobile-form-fields input,
-        .mobile-form-fields textarea {
-            width: 100%;
-            padding: var(--space-sm);
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 1rem;
-            box-sizing: border-box;
-        }
-        
-        .mobile-form-fields textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-        
         .calendar-card {
+            display: block;
+        }
+        .mobile-form-fields {
             display: none;
         }
-        
-        .mobile-submit-btn {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: var(--space-md) var(--space-lg);
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            width: 100%;
-            margin-top: var(--space-md);
-        }
-        
-        .mobile-submit-btn:hover {
-            background-color: #2980b9;
-        }
-        
         .book-now {
             display: none;
         }

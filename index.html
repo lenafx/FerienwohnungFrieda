@@ -238,59 +238,9 @@
                     </form>
                 </div>
                 <div id="booking-summary">
-                    <h3>Buchungsanfrage</h3>
-                    <button type="button" class="reset-btn">Auswahl zurücksetzen</button>
-                    <div class="form-group">
-                        <label for="summary-checkin">Anreise *</label>
-                        <input type="text" id="summary-checkin" value="" placeholder="TT.MM.JJJJ" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="summary-checkout">Abreise *</label>
-                        <input type="text" id="summary-checkout" value="" placeholder="TT.MM.JJJJ" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Nächte</label>
-                        <input type="text" value="" readonly placeholder="0">
-                    </div>
-                                        <div class="guest-selection">
-                        <label for="summary-guests">Anzahl Gäste *</label>
-                        <select id="summary-guests" class="guest-select" required>
-                            <option value="">Bitte wählen</option>
-                            <option value="1">1 Person</option>
-                            <option value="2">2 Personen</option>
-                            <option value="3">3 Personen</option>
-                        </select>
-                    </div>
                     <h4 class="cost-header">Kostenübersicht</h4>
                     <div class="cost-calculation">
                     </div>
-                    
-                    <!-- Mobile form fields -->
-                    <form id="mobile-booking-form" class="mobile-form-fields" action="https://formspree.io/f/xjkoyvzn" method="POST">
-                        <div class="form-group">
-                            <label for="mobile-name">Name *</label>
-                            <input type="text" id="mobile-name" name="name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="mobile-email">E-Mail *</label>
-                            <input type="email" id="mobile-email" name="email" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="mobile-phone">Telefon</label>
-                            <input type="tel" id="mobile-phone" name="phone">
-                        </div>
-                        <div class="form-group">
-                            <label for="mobile-message">Nachricht</label>
-                            <textarea id="mobile-message" name="message" rows="5" placeholder="Zusätzliche Wünsche oder Fragen..."></textarea>
-                        </div>
-                        <input type="hidden" id="mobile-checkin" name="checkin" value="">
-                        <input type="hidden" id="mobile-checkout" name="checkout" value="">
-                        <input type="hidden" id="mobile-guests" name="guests" value="">
-                        <input type="hidden" id="mobile-cost-summary" name="cost-summary" value="">
-                        <button type="submit" class="mobile-submit-btn">Anfrage senden</button>
-                    </form>
-                    
-                    <button class="book-now">Zur Buchungsanfrage</button>
                 </div>
             </div>
         </section>

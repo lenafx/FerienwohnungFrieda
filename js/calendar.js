@@ -270,6 +270,7 @@ class BookingCalendar {
                     this.renderCalendar();
                     this.setupNavigationListeners();
                     this.updateBookingSummary();
+                    this.updateBookingFormDates();
                     return;
                 }
                 console.log('Setting end date');
@@ -286,6 +287,8 @@ class BookingCalendar {
 
         this.renderCalendar();
         this.setupNavigationListeners();
+        this.updateBookingSummary();
+        this.updateBookingFormDates();
         this.updateBookingSummary();
     }
 
@@ -399,74 +402,29 @@ class BookingCalendar {
         const summary = document.getElementById('booking-summary');
         if (!summary) return;
 
-        const checkinInput = summary.querySelector('#summary-checkin');
-        const checkoutInput = summary.querySelector('#summary-checkout');
-        const nightsInput = summary.querySelector('input[readonly]:not(#summary-checkin):not(#summary-checkout)');
-        const guestSelect = summary.querySelector('#summary-guests');
+        // Get values from the main booking form
+        const checkinInput = document.getElementById('checkin');
+        const checkoutInput = document.getElementById('checkout');
+        const guestSelect = document.getElementById('guests');
 
-        if (this.selectedDates.start && this.selectedDates.end) {
-            const nights = Math.ceil((this.selectedDates.end - this.selectedDates.start) / (1000 * 60 * 60 * 24));
-            
-            if (checkinInput) checkinInput.value = this.formatDate(this.selectedDates.start);
-            if (checkoutInput) checkoutInput.value = this.formatDate(this.selectedDates.end);
-            if (nightsInput) nightsInput.value = nights;
-            
-            // Calculate costs
-            this.updateCostCalculation(nights);
-            
-            // Update the main booking form with selected dates
-            this.updateBookingFormDates();
-            
-            // Add event listener to the guest select if not already added
-            if (guestSelect && !guestSelect.hasEventListener) {
-                guestSelect.addEventListener('change', (e) => {
-                    // Update the main booking form's guest selection
-                    const mainGuestSelect = document.getElementById('guests');
-                    if (mainGuestSelect) {
-                        mainGuestSelect.value = e.target.value;
-                    }
-                    
-                    // Update cost calculation
-                    const nights = Math.ceil((this.selectedDates.end - this.selectedDates.start) / (1000 * 60 * 60 * 24));
-                    this.updateCostCalculation(nights);
-                });
-                guestSelect.hasEventListener = true;
-            }
-            
-            // Add event listener to the "Jetzt anfragen" button
-            const bookNowButton = summary.querySelector('.book-now');
-            if (bookNowButton && !bookNowButton.hasEventListener) {
-                bookNowButton.addEventListener('click', () => {
-                    // Scroll to the booking form with header-height offset
-                    const bookingForm = document.getElementById('booking-form');
-                    if (bookingForm) {
-                       // Get header height from CSS variable or fallback
-                       const headerOffset = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 70;
-                       const elementPosition = bookingForm.getBoundingClientRect().top + window.pageYOffset;
-                       const offsetPosition = elementPosition - 1.7*headerOffset;
-                       window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-                        // bookingForm.scrollIntoView({ behavior: 'smooth' });
-                    }
-                });
-                bookNowButton.hasEventListener = true;
-            }
-        } else if (this.selectedDates.start) {
-            if (checkinInput) checkinInput.value = this.formatDate(this.selectedDates.start);
-            if (checkoutInput) checkoutInput.value = '';
-            if (nightsInput) nightsInput.value = '';
-            
-            // Update only the check-in date in the main booking form
-            this.updateBookingFormDates();
-            
-            // Clear cost calculation
-            this.updateCostCalculation(0);
+        let start = null;
+        let end = null;
+        let guests = '';
+        if (checkinInput && checkinInput.value) {
+            start = window.bookingCalendar.parseEuropeanDate(checkinInput.value);
+        }
+        if (checkoutInput && checkoutInput.value) {
+            end = window.bookingCalendar.parseEuropeanDate(checkoutInput.value);
+        }
+        if (guestSelect && guestSelect.value) {
+            guests = guestSelect.value;
+        }
+
+        if (start && end && guests) {
+            const nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+            window.bookingCalendar.updateCostCalculation(nights, guests);
         } else {
-            if (checkinInput) checkinInput.value = '';
-            if (checkoutInput) checkoutInput.value = '';
-            if (nightsInput) nightsInput.value = '';
-            
-            // Clear cost calculation
-            this.updateCostCalculation(0);
+            window.bookingCalendar.updateCostCalculation(0, guests);
         }
     }
 
@@ -521,17 +479,19 @@ class BookingCalendar {
         }
     }
 
-    updateCostCalculation(nights) {
+    updateCostCalculation(nights, guestsOverride) {
         const summary = document.getElementById('booking-summary');
         if (!summary) return;
 
-        const guestSelect = summary.querySelector('#summary-guests');
+        // Always get guests from the main booking form
+        let guests = guestsOverride;
+        if (!guests) {
+            const guestSelect = document.getElementById('guests');
+            guests = guestSelect ? guestSelect.value : '';
+        }
         const costDisplay = summary.querySelector('.cost-calculation');
         const desktopCard = document.getElementById('desktop-cost-card');
         const desktopCostDisplay = desktopCard ? desktopCard.querySelector('.cost-calculation') : null;
-        
-        // Always show placeholders in desktop card if not enough info
-        let guests = guestSelect ? guestSelect.value : '';
         let html = '';
         if (!guests || nights <= 0) {
             html = `
@@ -603,33 +563,6 @@ class BookingCalendar {
             summaryText += `Endreinigung: ${cleaningFee.toFixed(2)}€\n`;
             summaryText += `Gesamtpreis: ${total.toFixed(2)}€`;
             costSummaryInput.value = summaryText;
-        }
-
-        // Also update the hidden mobile form fields for email consistency
-        const mobileCheckin = document.getElementById('mobile-checkin');
-        const mobileCheckout = document.getElementById('mobile-checkout');
-        const mobileGuests = document.getElementById('mobile-guests');
-        const mobileCostSummary = document.getElementById('mobile-cost-summary');
-        if (mobileCheckin) {
-            mobileCheckin.value = this.selectedDates.start ? this.formatDateForInput(this.selectedDates.start) : '';
-        }
-        if (mobileCheckout) {
-            mobileCheckout.value = this.selectedDates.end ? this.formatDateForInput(this.selectedDates.end) : '';
-        }
-        if (mobileGuests) {
-            // Try to get from summary guests select, fallback to main guests select
-            const summaryGuests = document.getElementById('summary-guests');
-            const mainGuests = document.getElementById('guests');
-            mobileGuests.value = (summaryGuests && summaryGuests.value) ? summaryGuests.value : (mainGuests && mainGuests.value ? mainGuests.value : '');
-        }
-        if (mobileCostSummary) {
-            let summaryText = '';
-            summaryText += `Unterkunft: ${nights} Nächt${nights > 1 ? 'e' : ''} × ${nightlyRate}€ = ${accommodationCost.toFixed(2)}€\n`;
-            summaryText += `Bettwäsche und Handtücher: ${bedsheetFee.toFixed(2)}€\n`;
-            summaryText += `Zwischensumme: ${subtotal.toFixed(2)}€\n`;
-            summaryText += `Endreinigung: ${cleaningFee.toFixed(2)}€\n`;
-            summaryText += `Gesamtpreis: ${total.toFixed(2)}€`;
-            mobileCostSummary.value = summaryText;
         }
     }
 
