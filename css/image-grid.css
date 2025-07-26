@@ -1,36 +1,12 @@
 /* Image Gallery Section */
 .desktop-images {
-    min-height: calc(100vh - var(--header-height));
+    /* min-height: calc(100vh - var(--header-height)); */
     background-color: white;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 0rem;
-}
-
-.gallery-header {
-    text-align: center;
-    margin-bottom: 0rem;
-    opacity: 0;
-    transform: translateY(30px);
-    animation: fadeInUp 1s ease forwards;
-    animation-delay: 0.3s;
-}
-
-.gallery-header h1 {
-    font-size: 1.5rem;
-    font-weight: 500;
-    color: #2c3e50;
-    margin-bottom: var(--space-md);
-    letter-spacing: 0.0px;
-}
-
-.gallery-header h2 {
-    font-size: 1.2rem;
-    font-weight: 300;
-    color: #2c3e50;
-    letter-spacing: 1px;
 }
 
 /* Image Grid Styles */
@@ -40,7 +16,7 @@
     grid-template-rows: repeat(2, 1fr);
     gap: 1rem;
     max-width: 1200px;
-    margin: 1rem auto;
+    margin: 0rem auto;
 }
 
 .image-grid-item {

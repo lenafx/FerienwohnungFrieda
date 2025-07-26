@@ -1081,12 +1081,67 @@ footer a:hover {
     text-decoration: line-through;
 } 
 
+/* Desktop card containing header and images */
+.desktop-card {
+    min-height: calc(100vh - var(--header-height));
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xl);
+    gap: var(--space-lg);
+}
+
+/* Desktop header section (only visible on desktop) */
+.desktop-header {
+    display: block;
+    background: white;
+/*     border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); */
+    margin: 0 auto 0 auto;
+    max-width: min(95vw, 700px);
+    padding: var(--space-xl) var(--space-lg);
+    text-align: center;
+}
+
+.desktop-header-content h1 {
+    font-size: 2rem;
+    font-weight: 300;
+    color: #2c3e50;
+    margin-bottom: 0;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+}
+
+.desktop-header-content h2 {
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: #34495e;
+    margin-bottom: var(--space-md);
+    line-height: 1.3;
+}
+
+.desktop-header-content p {
+    color: #4a5568;
+    font-size: 1rem;
+    margin-bottom: 0;
+}
+
 /* Mobile header section (only visible on mobile) */
 .mobile-header {
     display: none;
 }
 
 @media (max-width: 768px) {
+    .desktop-card {
+        display: none;
+    }
+    
+    .desktop-header {
+        display: none;
+    }
+    
     .mobile-header {
         display: block;
         background: #fff;
