@@ -4,12 +4,24 @@ class Lightbox {
     constructor() {
         console.log('Lightbox constructor called');
         
-        // Check if images exist
-        this.images = Array.from(document.querySelectorAll('.image-grid-item img'));
-        console.log('Found images:', this.images.length);
+        // Define all images independently of the grid
+        this.imageData = [
+            { src: 'images/frieda/dach.jpg', alt: 'Dach' },
+            { src: 'images/frieda/esstisch.jpg', alt: 'Esstisch' },
+            { src: 'images/frieda/kueche.jpeg', alt: 'Küche' },
+            { src: 'images/frieda/schlafzimmer.jpg', alt: 'Schlafzimmer' },
+            { src: 'images/frieda/bad.jpg', alt: 'Bad' },
+            { src: 'images/frieda/wohnen.jpg', alt: 'Wohnzimmer' },
+            { src: 'images/frieda/kinderzimmer.jpg', alt: 'Kinderzimmer' },
+            { src: 'images/frieda/fensterbank.jpg', alt: 'Fensterbank' },
+            { src: 'images/background/terrasse.jpg', alt: 'Terrasse' },
+            { src: 'images/background/kite.jpg', alt: 'Kite' },
+        ];
         
-        if (this.images.length === 0) {
-            console.error('No images found!');
+        console.log('Image data loaded:', this.imageData.length, 'images');
+        
+        if (this.imageData.length === 0) {
+            console.error('No images defined!');
             return;
         }
         
@@ -34,38 +46,46 @@ class Lightbox {
     setupEventListeners() {
         console.log('Setting up event listeners');
         
-        // Open lightbox on image click - use mousedown for better Firefox compatibility
-        this.images.forEach((img, index) => {
-            console.log('Adding click listener to image', index);
-            img.addEventListener('mousedown', (e) => {
-                console.log('=== IMAGE CLICK DETECTED ===');
-                console.log('Event target:', e.target);
-                console.log('Event currentTarget:', e.currentTarget);
-                console.log('Image index:', index);
-                console.log('Image src:', img.src);
-                
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('Image clicked:', index);
-                this.open(index);
-            });
+        // Add click listeners to all images in the grid
+        const gridImages = Array.from(document.querySelectorAll('.image-grid-item img'));
+        gridImages.forEach((img, index) => {
+            if (index < this.imageData.length) {
+                console.log('Adding click listener to grid image', index);
+                img.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Grid image clicked:', index);
+                    this.open(index);
+                });
+            }
         });
 
-        // Also add click listeners to the image grid items themselves
+        // Add click listeners to image grid items
         const imageItems = Array.from(document.querySelectorAll('.image-grid-item'));
         imageItems.forEach((item, index) => {
-            console.log('Adding click listener to image item', index);
-            item.addEventListener('mousedown', (e) => {
-                console.log('=== IMAGE ITEM CLICK DETECTED ===');
-                console.log('Event target:', e.target);
-                console.log('Event currentTarget:', e.currentTarget);
-                console.log('Item index:', index);
-                
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('Image item clicked:', index);
-                this.open(index);
-            });
+            if (index < this.imageData.length) {
+                console.log('Adding click listener to image item', index);
+                item.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Image item clicked:', index);
+                    this.open(index);
+                });
+            }
+        });
+
+        // Add click listeners to mobile slider images
+        const mobileSlides = Array.from(document.querySelectorAll('.mobile-images-slide'));
+        mobileSlides.forEach((slide, index) => {
+            if (index < this.imageData.length) {
+                console.log('Adding click listener to mobile slide', index);
+                slide.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Mobile slide clicked:', index);
+                    this.open(index);
+                });
+            }
         });
 
         // Close lightbox
@@ -117,20 +137,47 @@ class Lightbox {
         });
     }
 
+    // Method to add images programmatically
+    addImage(src, alt) {
+        this.imageData.push({ src, alt });
+        console.log('Added image:', src);
+    }
+
+    // Method to remove images programmatically
+    removeImage(index) {
+        if (index >= 0 && index < this.imageData.length) {
+            this.imageData.splice(index, 1);
+            console.log('Removed image at index:', index);
+        }
+    }
+
+    // Method to get all images
+    getImages() {
+        return this.imageData;
+    }
+
+    // Method to open lightbox with specific image by src
+    openBySrc(src) {
+        const index = this.imageData.findIndex(img => img.src === src);
+        if (index !== -1) {
+            this.open(index);
+        } else {
+            console.error('Image not found:', src);
+        }
+    }
+
     open(index) {
         console.log('=== OPEN METHOD CALLED ===');
         console.log('Opening lightbox for index:', index);
-        console.log('Current lightbox element:', this.lightbox);
-        console.log('Lightbox classes before:', this.lightbox.className);
+        
+        if (index < 0 || index >= this.imageData.length) {
+            console.error('Invalid index:', index);
+            return;
+        }
         
         this.currentIndex = index;
         this.updateImage();
         this.lightbox.classList.add('active');
-        
-        console.log('Lightbox classes after:', this.lightbox.className);
-        console.log('Lightbox display style:', this.lightbox.style.display);
-        console.log('Lightbox visibility style:', this.lightbox.style.visibility);
-        console.log('Lightbox opacity style:', this.lightbox.style.opacity);
         
         document.body.style.overflow = 'hidden';
         
@@ -147,22 +194,22 @@ class Lightbox {
     }
 
     prev() {
-        this.currentIndex = (this.currentIndex - 1 + this.images.length) % this.images.length;
+        this.currentIndex = (this.currentIndex - 1 + this.imageData.length) % this.imageData.length;
         console.log('Previous image, new index:', this.currentIndex);
         this.updateImage();
     }
 
     next() {
-        this.currentIndex = (this.currentIndex + 1) % this.images.length;
+        this.currentIndex = (this.currentIndex + 1) % this.imageData.length;
         console.log('Next image, new index:', this.currentIndex);
         this.updateImage();
     }
 
     updateImage() {
-        const img = this.images[this.currentIndex];
-        console.log('Updating image:', img.src);
-        this.lightboxImg.src = img.src;
-        this.lightboxImg.alt = img.alt;
+        const imageData = this.imageData[this.currentIndex];
+        console.log('Updating image:', imageData.src);
+        this.lightboxImg.src = imageData.src;
+        this.lightboxImg.alt = imageData.alt;
     }
 }
 
@@ -171,7 +218,7 @@ console.log('Setting up DOMContentLoaded listener');
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing lightbox...');
     try {
-        new Lightbox();
+        window.lightbox = new Lightbox();
     } catch (error) {
         console.error('Error initializing lightbox:', error);
     }
@@ -183,7 +230,7 @@ if (document.readyState === 'loading') {
 } else {
     console.log('DOM already loaded, initializing immediately');
     try {
-        new Lightbox();
+        window.lightbox = new Lightbox();
     } catch (error) {
         console.error('Error initializing lightbox:', error);
     }

@@ -81,9 +81,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Text background swipe for mobile
     function enableTextBackgroundSwipe() {
-        const slider = document.querySelector('.text-background-slider');
+        const slider = document.querySelector('.mobile-images-slider');
         if (!slider) return;
-        const slides = slider.querySelectorAll('.text-background-slide');
+        const slides = slider.querySelectorAll('.mobile-images-slide');
         if (slides.length < 2) return;
         let current = 0;
         let startX = null;
@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             // Hide/show text content based on slide
-            const textContent = document.querySelector('.text-background-content');
+            const textContent = document.querySelector('.mobile-images-content');
             if (textContent) {
                 if (idx === 0) {
                     // First slide - show text
