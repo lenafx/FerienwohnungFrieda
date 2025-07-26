@@ -289,6 +289,8 @@ main {
     min-width: 220px;
     max-width: 280px;
     flex: 1;
+    text-decoration: none;
+    display: block;
 }
 
 .contact-cards .contact-card:hover {
@@ -316,8 +318,8 @@ main {
     hyphens: auto;
 }
 
-.contact-cards .contact-card a {
-    color: #3498db;
+.contact-cards .contact-card {
+    color: #2c3e50;
     text-decoration: none;
     font-weight: 500;
     transition: color 0.3s ease;
@@ -326,13 +328,13 @@ main {
     hyphens: auto;
 }
 
-.contact-card.contact-card-address a {
+.contact-card.contact-card-address {
     color: #fff;
 }
 
-.contact-cards .contact-card a:hover {
+.contact-cards .contact-card:hover {
     color: #003366;
-    text-decoration: underline;
+    text-decoration: none;
 }
 
 .contact-card-address {
