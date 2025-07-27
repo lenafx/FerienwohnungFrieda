@@ -200,11 +200,13 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="checkin">Anreise *</label>
-                                <input type="text" id="checkin" name="checkin" required placeholder="TT.MM.JJJJ">
+                                <input type="text" id="checkin" name="checkin" required placeholder="TT.MM.JJJJ" readonly>
+                                <div class="date-picker" id="checkin-picker"></div>
                             </div>
                             <div class="form-group">
                                 <label for="checkout">Abreise *</label>
-                                <input type="text" id="checkout" name="checkout" required placeholder="TT.MM.JJJJ">
+                                <input type="text" id="checkout" name="checkout" required placeholder="TT.MM.JJJJ" readonly>
+                                <div class="date-picker" id="checkout-picker"></div>
                             </div>
                         </div>
                         <div class="form-group">
@@ -248,7 +250,6 @@
                 <h2>Entdecken Sie die maritime Stadt</h2>
             </div>
         </section>
-
 
         <section id="location-section" class="location-section">
             <div class="location-section-content">
@@ -327,5 +328,6 @@
     <script src="js/calendar.js"></script>
     <script src="js/lightbox.js"></script>
     <script src="js/mobile-menu.js"></script>
+    <script src="js/date-picker.js"></script>
 </body>
 </html> 

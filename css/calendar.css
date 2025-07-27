@@ -297,6 +297,169 @@
     background-color: white;
 }
 
+/* Date Picker Styles */
+.date-picker {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    border: 2px solid #e1e8ed;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    display: none;
+    min-width: 280px;
+    padding: 1rem;
+}
+
+.date-picker.active {
+    display: block;
+}
+
+.form-group {
+    position: relative;
+}
+
+/* Date Picker Component Styles */
+.date-picker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.date-picker-nav {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #2c3e50;
+    padding: 0.5rem;
+    transition: color 0.2s ease;
+}
+
+.date-picker-nav:hover {
+    color: #3498db;
+}
+
+.date-picker-nav:disabled {
+    color: #ccc;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.date-picker-nav:disabled:hover {
+    color: #ccc;
+}
+
+.date-picker-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+.date-picker-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.weekday {
+    text-align: center;
+    font-weight: bold;
+    color: #666;
+    font-size: 0.8rem;
+    padding: 0.3rem;
+}
+
+.date-picker-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.2rem;
+}
+
+.date-picker-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    margin: 0.1rem;
+    min-width: 0;
+    padding: 0.2rem;
+    position: relative;
+}
+
+.date-picker-day:not(.other-month):not(.past):not(.booked):hover {
+    background-color: #f0f0f0;
+}
+
+.date-picker-day.today {
+    border: 2px solid #1e3a8a;
+    font-weight: bold;
+}
+
+.date-picker-day.past {
+    background-color: #f8f9fa;
+    color: #ccc;
+    cursor: not-allowed;
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.date-picker-day.booked {
+    background-color: #f8f9fa;
+    color: #ccc;
+    cursor: not-allowed;
+    text-decoration: line-through;
+}
+
+.date-picker-day.selected {
+    background-color: #3498db;
+    color: white;
+    font-weight: bold;
+}
+
+.date-picker-day.in-range {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.date-picker-day.empty {
+    background-color: transparent;
+    cursor: default;
+    color: transparent;
+}
+
+.date-picker-day.past::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    z-index: 1;
+}
+
+.date-picker-day.past::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: #ccc;
+    transform: rotate(-45deg);
+    z-index: 2;
+}
+
 .booking-form input:focus,
 .booking-form select:focus,
 .booking-form textarea:focus {
